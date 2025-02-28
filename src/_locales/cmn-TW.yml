@@ -134,6 +134,7 @@ settings:
   link_opening_behavior_opt:
     current_tab: 目前索引標籤
     current_tab_if_not_homepage: 不在首頁則在目前索引標籤開啓，否則在新索引標籤
+    background: 後台打開
     new_tab: 新索引標籤
     drawer: 抽屜開啓
   top_bar_link_opening_behavior: 頂欄連結開啓行爲

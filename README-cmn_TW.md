@@ -1,4 +1,4 @@
-# BewlyBewly
+# BewlyCat
 
 [English](README.md) | [官话 - 简体中文](README-cmn_CN.md) | 官話 - 繁體中文 | [廣東話](README-jyut.md)
 
@@ -12,6 +12,9 @@
 ![min2](https://github.com/hakadao/BewlyBewly/assets/33394391/3e75dd20-f60b-4645-b434-23a24c72959c) -->
 
 ## 👋 介紹
+
+> [!NOTE]
+> 此项目基于BewlyBewly开发，并在其基础上进行功能扩充和调整，并合并了一些其他拓展的功能。
 
 > [!IMPORTANT]
 > BewlyBewly 主要著重於頁面調整和改良，而不是完善功能和提升效率。

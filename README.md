@@ -1,6 +1,6 @@
-# BewlyBewly
+# BewlyCat
 
-English | [官话 - 简体中文](README-cmn_CN.md) | [官話 - 繁體中文](README-cmn_TW.md) | [廣東話](README-jyut.md)
+English | [官话 - 简体中文](README-cmn_CN.md) | [官話 - 繁體中文](README-cmn_TW.md)
 
 <p align="center" style="margin-bottom: 0px !important;">
 <img width="300" alt="BewlyBewly icon" src="https://cdn.jsdelivr.net/gh/BewlyBewly/Imgs/logos/bewlybewly-vtuber-logo.png"><br/>
@@ -12,6 +12,9 @@ English | [官话 - 简体中文](README-cmn_CN.md) | [官話 - 繁體中文](RE
 ![min2](https://github.com/hakadao/BewlyBewly/assets/33394391/3e75dd20-f60b-4645-b434-23a24c72959c) -->
 
 ## 👋 Introduction
+
+> [!NOTE]
+> 此项目基于BewlyBewly开发，并在其基础上进行功能扩充和调整，并合并了一些其他拓展的功能。
 
 > [!IMPORTANT]
 > BewlyBewly mainly focuses on page adjustments and optimization rather than improving functionally and efficiency.
