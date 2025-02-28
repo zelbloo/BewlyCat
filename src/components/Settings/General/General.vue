@@ -40,6 +40,10 @@ const openModeOptions = computed(() => {
       value: 'currentTabIfNotHomepage',
     },
     {
+      label: t('settings.link_opening_behavior_opt.background'),
+      value: 'background',
+    },
+    {
       label: t('settings.link_opening_behavior_opt.new_tab'),
       value: 'newTab',
     },
@@ -55,6 +59,10 @@ const videoCardOpenModeOptions = computed(() => {
     {
       label: t('settings.link_opening_behavior_opt.drawer'),
       value: 'drawer',
+    },
+    {
+      label: t('settings.link_opening_behavior_opt.background'),
+      value: 'background',
     },
     {
       label: t('settings.link_opening_behavior_opt.new_tab'),
@@ -88,6 +96,10 @@ watch(() => settings.value.language, (newValue) => {
 <template>
   <div>
     <SettingsItemGroup :title="$t('settings.group_common')">
+      <SettingsItem :title="$t('settings.enable_settings_sync')" :desc="$t('settings.enable_settings_sync_desc')">
+        <Radio v-model="settings.enableSettingsSync" />
+      </SettingsItem>
+
       <SettingsItem :title="$t('settings.touch_screen_optimization')" :desc="$t('settings.touch_screen_optimization_desc')">
         <Radio v-model="settings.touchScreenOptimization" />
       </SettingsItem>

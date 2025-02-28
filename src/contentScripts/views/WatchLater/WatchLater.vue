@@ -9,6 +9,7 @@ import { useMainStore } from '~/stores/mainStore'
 import api from '~/utils/api'
 import { calcCurrentTime } from '~/utils/dataFormatter'
 import { getCSRF, openLinkToNewTab, removeHttpFromUrl } from '~/utils/main'
+import { openLinkInBackground } from '~/utils/tabs'
 
 const { t } = useI18n()
 const { openIframeDrawer } = useBewlyApp()
@@ -144,6 +145,9 @@ function handleLinkClick(url: string) {
   }
   else if (settings.value.videoCardLinkOpenMode === 'currentTab') {
     window.open(url, '_self') // 在当前标签页打开
+  }
+  else if (settings.value.videoCardLinkOpenMode === 'background') {
+    openLinkInBackground(url)
   }
   else {
     openLinkToNewTab(url) // 在新标签页打开

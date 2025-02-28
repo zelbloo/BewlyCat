@@ -13,6 +13,7 @@ import api from '~/utils/api'
 import { getTvSign, TVAppKey } from '~/utils/authProvider'
 import { calcCurrentTime, calcTimeSince, numFormatter } from '~/utils/dataFormatter'
 import { getCSRF, removeHttpFromUrl } from '~/utils/main'
+import { openLinkInBackground } from '~/utils/tabs'
 
 import Tooltip from '../Tooltip.vue'
 import type { Video } from './types'
@@ -166,7 +167,10 @@ function handelMouseLeave() {
 
 function handleClick(event: MouseEvent) {
   videoCurrentTime.value = getCurrentTime(videoElement)
-
+  if (settings.value.videoCardLinkOpenMode === 'background' && videoUrl.value && !event.ctrlKey && !event.metaKey) {
+    event.preventDefault()
+    openLinkInBackground(videoUrl.value)
+  }
   if (settings.value.videoCardLinkOpenMode === 'drawer' && videoUrl.value && !event.ctrlKey && !event.metaKey) {
     event.preventDefault()
     openIframeDrawer(videoUrl.value)
@@ -256,7 +260,7 @@ provide('getVideoType', () => props.type!)
           :style="{ display: horizontal ? 'flex' : 'block', gap: horizontal ? '1.5rem' : '0' }"
           :href="videoUrl"
           type="videoCard"
-          :custom-click-event="settings.videoCardLinkOpenMode === 'drawer'"
+          :custom-click-event="settings.videoCardLinkOpenMode === 'drawer' || settings.videoCardLinkOpenMode === 'background'"
           @mouseenter="handleMouseEnter"
           @mouseleave="handelMouseLeave"
           @click="handleClick"

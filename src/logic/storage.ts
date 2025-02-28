@@ -11,6 +11,8 @@ export interface Settings {
   enableGridLayoutSwitcher: boolean
   enableHorizontalScrolling: boolean
 
+  enableSettingsSync: boolean // 是否启用同步
+
   language: string
   customizeFont: 'default' | 'recommend' | 'custom'
   fontFamily: string
@@ -24,8 +26,8 @@ export interface Settings {
   enableVideoPreview: boolean
 
   // Link Opening Behavior
-  videoCardLinkOpenMode: 'drawer' | 'newTab' | 'currentTab'
-  topBarLinkOpenMode: 'currentTab' | 'currentTabIfNotHomepage' | 'newTab'
+  videoCardLinkOpenMode: 'drawer' | 'newTab' | 'currentTab' | 'background'
+  topBarLinkOpenMode: 'currentTab' | 'currentTabIfNotHomepage' | 'newTab' | 'background'
   searchBarLinkOpenMode: 'currentTab' | 'currentTabIfNotHomepage' | 'newTab'
   closeDrawerWithoutPressingEscAgain: boolean
 
@@ -115,7 +117,7 @@ export const originalSettings: Settings = {
   touchScreenOptimization: false,
   enableGridLayoutSwitcher: true,
   enableHorizontalScrolling: false,
-
+  enableSettingsSync: false,
   language: '',
   customizeFont: 'recommend',
   fontFamily: '',

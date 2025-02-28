@@ -11,7 +11,9 @@ export enum TABS_MESSAGE {
 
 function handleMessage(message: Message) {
   if (message.contentScriptQuery === TABS_MESSAGE.OPEN_LINK_IN_BACKGROUND) {
-    return browser.tabs.create({ url: message.url, active: false })
+    // 处理以 // 开头的 URL
+    const url = message.url.startsWith('//') ? `https:${message.url}` : message.url
+    return browser.tabs.create({ url, active: false })
   }
 }
 

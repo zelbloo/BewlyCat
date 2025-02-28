@@ -2,9 +2,10 @@
 import { useBewlyApp } from '~/composables/useAppProvider'
 import { settings } from '~/logic'
 import { isHomePage } from '~/utils/main'
+import { openLinkInBackground } from '~/utils/tabs'
 
 const props = defineProps<{
-  href: string
+  href?: string // 修改这里，添加 ? 使其成为可选属性
   title?: string
   rel?: string
   type: 'topBar' | 'videoCard'
@@ -53,12 +54,24 @@ function handleClick(event: MouseEvent) {
   if (openMode.value === 'drawer') {
     event.preventDefault()
     openIframeDrawer(props.href)
+    return
+  }
+
+  if (openMode.value === 'background' && props.href) {
+    event.preventDefault()
+    openLinkInBackground(props.href)
   }
 }
 </script>
 
 <template>
-  <a :href="href" :target="target" :title="title" :rel="rel" @click="handleClick">
+  <a
+    :href="href ?? 'javascript:void(0)'"
+    :target="target"
+    :title="title"
+    :rel="rel"
+    @click="handleClick"
+  >
     <slot />
   </a>
 </template>
