@@ -159,104 +159,68 @@ if (settings.value.adaptToOtherPageStyles && isHomePage()) {
 }
 
 window.addEventListener(BEWLY_MOUNTED, () => {
-  if (beforeLoadedStyleEl)
+  if (beforeLoadedStyleEl) {
     document.documentElement.removeChild(beforeLoadedStyleEl)
+    if (location.pathname.startsWith('/video/')) {
+      // 根据设置应用默认播放器模式
+      applyDefaultPlayerMode()
+    }
+  }
 })
 
-// 记录页面是否已经应用过播放器模式设置
-let playerModeApplied = false
-
-async function handleUrlChange() {
-  if (location.pathname.startsWith('/video/')) {
-    // 根据设置应用默认播放器模式
-    applyPlayerMode()
-  }
-}
-
-// 分离出应用播放器模式的函数，以便在不同事件中调用
-function applyPlayerMode() {
-  if (playerModeApplied)
-    return
-
+// 应用默认播放器模式
+function applyDefaultPlayerMode() {
   const playerMode = settings.value.defaultVideoPlayerMode
-
-  // 检查播放器是否已加载
-  const checkPlayerAndApply = () => {
-    // 查找视频播放器元素
-    const playerContainer = document.querySelector('.bpx-player-container')
-      || document.querySelector('.bilibili-player-area')
-
-    if (playerContainer) {
-      // 播放器已加载，应用模式
-      setTimeout(async () => {
-        switch (playerMode) {
-          case 'fullscreen':
-            await fullscreen()
-            break
-          case 'webFullscreen':
-            await webFullscreen()
-            break
-          case 'widescreen':
-            await widescreen()
-            break
-          default:
-            // 默认模式不做任何操作
-            break
-        }
-        // 标记已应用播放器模式
-        playerModeApplied = true
-      }, 500)
-      return true
-    }
-    return false
-  }
-
-  // 立即尝试应用一次
-  if (checkPlayerAndApply())
+  if (!playerMode || playerMode === 'default')
     return
 
-  // 如果播放器尚未加载，使用MutationObserver监听DOM变化
-  const observer = new MutationObserver((mutations, obs) => {
-    if (checkPlayerAndApply()) {
-      // 成功应用后停止观察
-      obs.disconnect()
-    }
-  })
-
-  // 开始观察DOM变化
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-  })
-
-  // 设置超时，避免无限期观察
-  setTimeout(() => {
-    observer.disconnect()
-  }, 10000) // 10秒后停止尝试
+  switch (playerMode) {
+    case 'fullscreen':
+      fullscreen()
+      break
+    case 'webFullscreen':
+      webFullscreen()
+      break
+    case 'widescreen':
+      widescreen()
+      break
+  }
 }
+
+// 监听URL变化，用于处理SPA页面导航
+let lastUrl = location.href
+function checkForUrlChanges() {
+  if (location.href !== lastUrl) {
+    lastUrl = location.href
+    if (location.pathname.startsWith('/video/')) {
+      // 当URL变化且是视频页面时，应用默认播放器模式
+      applyDefaultPlayerMode()
+    }
+  }
+  requestAnimationFrame(checkForUrlChanges)
+}
+requestAnimationFrame(checkForUrlChanges)
 
 // 处理页面可见性变化
 function handleVisibilityChange() {
-  // 当页面变为可见且是视频页面，但还没应用过播放器模式时
-  if (document.visibilityState === 'visible'
-    && location.pathname.startsWith('/video/')
-    && !playerModeApplied) {
-    applyPlayerMode()
+  // 当页面变为可见且是视频页面时
+  if (document.visibilityState === 'visible' && location.pathname.startsWith('/video/')) {
+    applyDefaultPlayerMode()
   }
 }
 
-// 处理窗口获得焦点事件
-function handleWindowFocus() {
-  if (location.pathname.startsWith('/video/') && !playerModeApplied) {
-    applyPlayerMode()
+// 添加页面加载和可见性变化的监听
+window.addEventListener('load', () => {
+  if (location.pathname.startsWith('/video/')) {
+    applyDefaultPlayerMode()
   }
-}
-
-// 添加页面加载、URL变化、可见性变化和窗口焦点的监听
-window.addEventListener('load', handleUrlChange)
-window.addEventListener('popstate', handleUrlChange)
-document.addEventListener('visibilitychange', handleVisibilityChange)
-window.addEventListener('focus', handleWindowFocus)
+})
+window.addEventListener('pageshow', () => {
+  if (location.pathname.startsWith('/video/')) {
+    applyDefaultPlayerMode()
+  }
+})
+window.addEventListener('visibilitychange', handleVisibilityChange)
 
 // Set the original Bilibili top bar to `display: none` to prevent it from showing before the load
 // see: https://github.com/BewlyBewly/BewlyBewly/issues/967
