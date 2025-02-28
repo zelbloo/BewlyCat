@@ -148,6 +148,13 @@ settings:
     有時候，搜尋結果上方的廣告實際上是年末總結、年度報告這些。
     如果你不想這些內容被誤刪，請停用此選項。
 
+  video_default_player_mode: 影片預設顯示模式
+  video_player_mode:
+    default: 預設
+    fullscreen: 全螢幕
+    web_fullscreen: 網頁全螢幕
+    widescreen: 寬螢幕
+
   enable_video_preview: 啓用影片預覽功能（如果可以的話）
   enable_video_ctrl_bar_on_video_card: 在影片卡片上顯示影片控制欄
   hover_video_card_delayed: 將滑鼠懸停在影片卡片上時延遲影片預覽
@@ -188,7 +195,7 @@ settings:
     dark: 深色
     auto: 自動
   theme_color: 主題色
-  gradient_theme_color_background: 在深色模式下使用漸層主題色作爲背景
+  gradient_theme_color_background: 在深色模式下使用漸層主題色作��为背景
   wallpaper_mode: 背景圖片模式
   wallpaper_mode_desc: '使用網址: 直接使用網路圖片的網址來設定背景圖片。'
   wallpaper_mode_opt:

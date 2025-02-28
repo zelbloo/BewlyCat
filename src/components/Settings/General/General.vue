@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
 
+import Select from '~/components/Select.vue'
 import { settings } from '~/logic'
 
 import SettingsItem from '../components/SettingsItem.vue'
@@ -84,6 +85,28 @@ const fontPreferenceOptions = computed(() => {
     {
       label: t('settings.customize_font_opt.custom'),
       value: 'custom',
+    },
+  ]
+})
+
+// 添加视频播放器模式选项
+const videoPlayerModeOptions = computed(() => {
+  return [
+    {
+      label: t('settings.video_player_mode.default'),
+      value: 'default',
+    },
+    {
+      label: t('settings.video_player_mode.fullscreen'),
+      value: 'fullscreen',
+    },
+    {
+      label: t('settings.video_player_mode.web_fullscreen'),
+      value: 'webFullscreen',
+    },
+    {
+      label: t('settings.video_player_mode.widescreen'),
+      value: 'widescreen',
     },
   ]
 })
@@ -187,6 +210,12 @@ watch(() => settings.value.language, (newValue) => {
       </SettingsItem>
       <SettingsItem :title="$t('settings.block_top_search_page_ads')" :desc="$t('settings.block_top_search_page_ads_desc')">
         <Radio v-model="settings.blockTopSearchPageAds" />
+      </SettingsItem>
+    </SettingsItemGroup>
+
+    <SettingsItemGroup>
+      <SettingsItem :title="$t('settings.video_default_player_mode')">
+        <Select v-model="settings.defaultVideoPlayerMode" :options="videoPlayerModeOptions" w="full" />
       </SettingsItem>
     </SettingsItemGroup>
 

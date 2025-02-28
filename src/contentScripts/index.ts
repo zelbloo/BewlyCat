@@ -10,6 +10,7 @@ import { setupApp } from '~/logic/common-setup'
 import RESET_BEWLY_CSS from '~/styles/reset.css?raw'
 import { runWhenIdle } from '~/utils/lazyLoad'
 import { compareVersions, injectCSS, isHomePage, isInIframe, isNotificationPage, isVideoOrBangumiPage } from '~/utils/main'
+import { fullscreen, webFullscreen, widescreen } from '~/utils/player'
 import { SVG_ICONS } from '~/utils/svgIcons'
 
 import { version } from '../../package.json'
@@ -161,6 +162,101 @@ window.addEventListener(BEWLY_MOUNTED, () => {
   if (beforeLoadedStyleEl)
     document.documentElement.removeChild(beforeLoadedStyleEl)
 })
+
+// 记录页面是否已经应用过播放器模式设置
+let playerModeApplied = false
+
+async function handleUrlChange() {
+  if (location.pathname.startsWith('/video/')) {
+    // 根据设置应用默认播放器模式
+    applyPlayerMode()
+  }
+}
+
+// 分离出应用播放器模式的函数，以便在不同事件中调用
+function applyPlayerMode() {
+  if (playerModeApplied)
+    return
+
+  const playerMode = settings.value.defaultVideoPlayerMode
+
+  // 检查播放器是否已加载
+  const checkPlayerAndApply = () => {
+    // 查找视频播放器元素
+    const playerContainer = document.querySelector('.bpx-player-container')
+      || document.querySelector('.bilibili-player-area')
+
+    if (playerContainer) {
+      // 播放器已加载，应用模式
+      setTimeout(async () => {
+        switch (playerMode) {
+          case 'fullscreen':
+            await fullscreen()
+            break
+          case 'webFullscreen':
+            await webFullscreen()
+            break
+          case 'widescreen':
+            await widescreen()
+            break
+          default:
+            // 默认模式不做任何操作
+            break
+        }
+        // 标记已应用播放器模式
+        playerModeApplied = true
+      }, 500)
+      return true
+    }
+    return false
+  }
+
+  // 立即尝试应用一次
+  if (checkPlayerAndApply())
+    return
+
+  // 如果播放器尚未加载，使用MutationObserver监听DOM变化
+  const observer = new MutationObserver((mutations, obs) => {
+    if (checkPlayerAndApply()) {
+      // 成功应用后停止观察
+      obs.disconnect()
+    }
+  })
+
+  // 开始观察DOM变化
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  })
+
+  // 设置超时，避免无限期观察
+  setTimeout(() => {
+    observer.disconnect()
+  }, 10000) // 10秒后停止尝试
+}
+
+// 处理页面可见性变化
+function handleVisibilityChange() {
+  // 当页面变为可见且是视频页面，但还没应用过播放器模式时
+  if (document.visibilityState === 'visible'
+    && location.pathname.startsWith('/video/')
+    && !playerModeApplied) {
+    applyPlayerMode()
+  }
+}
+
+// 处理窗口获得焦点事件
+function handleWindowFocus() {
+  if (location.pathname.startsWith('/video/') && !playerModeApplied) {
+    applyPlayerMode()
+  }
+}
+
+// 添加页面加载、URL变化、可见性变化和窗口焦点的监听
+window.addEventListener('load', handleUrlChange)
+window.addEventListener('popstate', handleUrlChange)
+document.addEventListener('visibilitychange', handleVisibilityChange)
+window.addEventListener('focus', handleWindowFocus)
 
 // Set the original Bilibili top bar to `display: none` to prevent it from showing before the load
 // see: https://github.com/BewlyBewly/BewlyBewly/issues/967

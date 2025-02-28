@@ -1,8 +1,8 @@
 {
-  "name": "bewly-bewly",
+  "name": "bewly-cat",
   "displayName": "BewlyCat",
   "type": "module",
-  "version": "0.41.1.1",
+  "version": "0.0.1",
   "private": true,
   "packageManager": "pnpm@9.5.0",
   "description": "Just make a few small changes to your Bilibili homepage.",

@@ -111,6 +111,9 @@ export interface Settings {
   showTopBar: boolean
   useOriginalBilibiliTopBar: boolean
   useOriginalBilibiliHomepage: boolean
+
+  // 新增视频播放器默认样式设置
+  defaultVideoPlayerMode: 'default' | 'fullscreen' | 'webFullscreen' | 'widescreen'
 }
 
 export const originalSettings: Settings = {
@@ -215,6 +218,9 @@ export const originalSettings: Settings = {
   showTopBar: true,
   useOriginalBilibiliTopBar: false,
   useOriginalBilibiliHomepage: false,
+
+  // 新增默认值
+  defaultVideoPlayerMode: 'default',
 }
 
 export const settings = useStorageLocal('settings', ref<Settings>(originalSettings), { mergeDefaults: true })

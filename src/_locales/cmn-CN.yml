@@ -148,6 +148,13 @@ settings:
     有时候，搜索结果上方的广告实际上是年末总结或年度报告。
     如果你不想这些内容被误删除，请禁用此选项。
 
+  video_default_player_mode: 视频默认显示模式
+  video_player_mode:
+    default: 默认
+    fullscreen: 全屏
+    web_fullscreen: 网页全屏
+    widescreen: 宽屏
+
   enable_video_preview: 启用视频预览功能（如果可以的话）
   enable_video_ctrl_bar_on_video_card: 在视频卡片上显示视频控制栏
   hover_video_card_delayed: 将鼠标悬停在视频卡片上时延迟视频预览

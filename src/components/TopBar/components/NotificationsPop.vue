@@ -57,6 +57,7 @@ function getUnreadMessageCount() {
       list.value[3].unreadCount = resData.sys_msg
     }
   }).catch(() => {
+    console.error('getUnreadMessageCount error')
     list.value[0].unreadCount = 0
     list.value[1].unreadCount = 0
     list.value[2].unreadCount = 0
