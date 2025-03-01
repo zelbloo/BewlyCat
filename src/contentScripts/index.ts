@@ -10,7 +10,7 @@ import { setupApp } from '~/logic/common-setup'
 import RESET_BEWLY_CSS from '~/styles/reset.css?raw'
 import { runWhenIdle } from '~/utils/lazyLoad'
 import { compareVersions, injectCSS, isHomePage, isInIframe, isNotificationPage, isVideoOrBangumiPage } from '~/utils/main'
-import { fullscreen, webFullscreen, widescreen } from '~/utils/player'
+import { defaultMode, fullscreen, webFullscreen, widescreen } from '~/utils/player'
 import { SVG_ICONS } from '~/utils/svgIcons'
 
 import { version } from '../../package.json'
@@ -171,8 +171,11 @@ window.addEventListener(BEWLY_MOUNTED, () => {
 // 应用默认播放器模式
 function applyDefaultPlayerMode() {
   const playerMode = settings.value.defaultVideoPlayerMode
-  if (!playerMode || playerMode === 'default')
+  if (!playerMode || playerMode === 'default') {
+    // 默认模式也需要居中显示
+    defaultMode()
     return
+  }
 
   switch (playerMode) {
     case 'fullscreen':

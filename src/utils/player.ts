@@ -20,6 +20,7 @@ const _videoClassTag = {
       '.bpx-player-ctrl-full,.bilibili-player-video-btn-fullscreen,.squirtle-video-fullscreen',
   videoArea: '.bilibili-player-video-wrap,.bpx-player-video-area',
   video: '#bilibiliPlayer video,#bilibili-player video,.bilibili-player video,.player-container video,#bilibiliPlayer bwp-video,#bilibili-player bwp-video,.bilibili-player bwp-video,.player-container bwp-video,#bofqi video,[aria-label="哔哩哔哩播放器"] video',
+  player: '#bilibili-player,.bpx-player-container',
 }
 
 // 重试任务类，用于处理重试逻辑
@@ -82,18 +83,53 @@ export function webFullscreen() {
   }).start()
 }
 
+// 将播放器滚动到合适位置，优先保证弹幕栏可见
+function scrollPlayerToOptimalPosition() {
+  const playerElement = document.querySelector(_videoClassTag.player)
+  if (!playerElement)
+    return
+
+  // 查找弹幕发送栏
+  const sendingBar = document.querySelector('.bpx-player-sending-bar')
+  if (sendingBar) {
+    // 将弹幕发送栏底部滚动到窗口底部
+    const rect = sendingBar.getBoundingClientRect()
+    const bottomOffset = window.innerHeight - rect.bottom
+    if (bottomOffset < 0) {
+      window.scrollBy({
+        top: -bottomOffset,
+        behavior: 'smooth',
+      })
+    }
+  }
+  else {
+    // 如果找不到弹幕发送栏，则直接居中显示播放器
+    playerElement.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  }
+}
+
 export function widescreen() {
   new RetryTask(20, 500, () => {
     // 检查是否已经处于宽屏状态
     if (document.querySelector('[data-screen=\'wide\']')) {
+      // 即使已经是宽屏状态，也执行滚动
+      scrollPlayerToOptimalPosition()
       return true
     }
 
     const widescreenBtn = document.querySelector(_videoClassTag.widescreen) as HTMLElement
     if (widescreenBtn) {
       widescreenBtn.click()
+      // 点击后立即执行滚动
+      setTimeout(() => scrollPlayerToOptimalPosition(), 800)
       return true
     }
     return false
   }).start()
+}
+
+// 默认模式下也执行滚动
+export function defaultMode() {
+  scrollPlayerToOptimalPosition()
+  return true
 }
