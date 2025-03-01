@@ -2,7 +2,12 @@
 import { useI18n } from 'vue-i18n'
 
 import { settings } from '~/logic'
-import api from '~/utils/api'
+
+const props = defineProps<{
+  // 接收外部传入的通知数据
+  unReadMessage?: any
+  unReadDm?: any
+}>()
 
 const emit = defineEmits<{
   (e: 'itemClick', item: { name: string, url: string, unreadCount: number, icon: string }): void
@@ -42,37 +47,22 @@ const list = computed((): { name: string, url: string, unreadCount: number, icon
   },
 ])
 
-onMounted(() => {
-  getUnreadMessageCount()
-})
+// 监听外部传入的数据变化，更新列表
+watch(() => props.unReadMessage, (newVal) => {
+  if (newVal) {
+    list.value[0].unreadCount = newVal.recv_reply || 0
+    list.value[1].unreadCount = newVal.at || 0
+    list.value[2].unreadCount = newVal.recv_like || 0
+    list.value[3].unreadCount = newVal.sys_msg || 0
+  }
+}, { immediate: true, deep: true })
 
-function getUnreadMessageCount() {
-  api.notification.getUnreadMsg().then((res) => {
-    if (res.code === 0) {
-      const resData = res.data
-
-      list.value[0].unreadCount = resData.recv_reply
-      list.value[1].unreadCount = resData.at
-      list.value[2].unreadCount = resData.recv_like
-      list.value[3].unreadCount = resData.sys_msg
-    }
-  }).catch(() => {
-    console.error('getUnreadMessageCount error')
-    list.value[0].unreadCount = 0
-    list.value[1].unreadCount = 0
-    list.value[2].unreadCount = 0
-    list.value[3].unreadCount = 0
-  })
-
-  api.notification.getUnreadDm().then((res) => {
-    if (res.code === 0) {
-      const resData = res.data
-      list.value[4].unreadCount = resData.follow_unread
-    }
-  }).catch(() => {
-    list.value[4].unreadCount = 0
-  })
-}
+watch(() => props.unReadDm, (newVal) => {
+  if (newVal) {
+    // 同时处理follow_unread和unfollow_unread
+    list.value[4].unreadCount = (newVal.follow_unread || 0) + (newVal.unfollow_unread || 0)
+  }
+}, { immediate: true, deep: true })
 
 function handleClick(event: MouseEvent, item: { name: string, url: string, unreadCount: number, icon: string }) {
   if (settings.value.openNotificationsPageAsDrawer) {

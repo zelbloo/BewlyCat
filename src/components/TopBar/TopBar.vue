@@ -860,6 +860,8 @@ defineExpose({
                       v-if="popupVisible.notifications"
                       ref="notificationsTransformer"
                       class="bew-popover"
+                      :un-read-message="unReadMessage"
+                      :un-read-dm="unReadDm"
                       @click.stop="() => {}"
                       @item-click="handleNotificationsItemClick"
                     />

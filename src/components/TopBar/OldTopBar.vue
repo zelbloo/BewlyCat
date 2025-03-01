@@ -670,6 +670,8 @@ defineExpose({
                     <NotificationsPop
                       v-if="popupVisible.notifications"
                       class="bew-popover"
+                      :un-read-message="unReadMessage"
+                      :un-read-dm="unReadDm"
                     />
                   </Transition>
                 </div>
