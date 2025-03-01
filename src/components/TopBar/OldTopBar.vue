@@ -468,13 +468,13 @@ defineExpose({
             mask-image: linear-gradient(to bottom,  black 20%, transparent);
           "
           :style="{ backdropFilter: settings.disableFrostedGlass ? 'none' : 'blur(4px)' }"
-          pos="absolute top-0 left-0" w-full h-80px
+          pos="absolute top-0 left-0" w-full h="$bew-top-bar-height"
           pointer-events-none transform-gpu
         />
         <Transition name="fade">
           <div
             v-if="!reachTop"
-            pos="absolute top-0 left-0" w-full h-80px
+            pos="absolute top-0 left-0" w-full h="$bew-top-bar-height"
             pointer-events-none opacity-80
             :style="{
               background: `linear-gradient(to bottom, ${(

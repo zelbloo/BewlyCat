@@ -504,7 +504,7 @@ defineExpose({
             mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 1) 24px, rgba(0, 0, 0, 0.9) 44px, transparent);
           "
           :style="{ backdropFilter: settings.disableFrostedGlass ? 'none' : 'blur(12px)' }"
-          pos="absolute top-0 left-0" w-full h="[calc(var(--bew-top-bar-height)+16px)]"
+          pos="absolute top-0 left-0" w-full h="$bew-top-bar-height"
           pointer-events-none transform-gpu
         />
 
@@ -518,7 +518,7 @@ defineExpose({
                 : 'color-mix(in oklab, var(--bew-bg), transparent 20%), color-mix(in oklab, var(--bew-bg), transparent 40%) calc(var(--bew-top-bar-height) / 2)'
             }, transparent)`,
             opacity: reachTop ? 0.8 : 1,
-            height: reachTop ? 'var(--bew-top-bar-height)' : 'calc(var(--bew-top-bar-height) + 20px)',
+            height: 'var(--bew-top-bar-height)',
           }"
         />
 
@@ -1012,10 +1012,10 @@ defineExpose({
     // --uno: "shadow-[var(--bew-shadow-edge-glow-1),var(--bew-shadow-2)]";
     // backdrop-filter: var(--bew-filter-glass-1);
 
-    &.hover,
-    &:hover {
-      // --uno: "backdrop-filter-none bg-$bew-elevated-solid";
-    }
+    // &.hover,
+    //&:hover {
+    //  // --uno: "backdrop-filter-none bg-$bew-elevated-solid";
+    //}
 
     // Add a safety zone to prevent the avatar from collapsing quickly after leaving
     &:hover::after,
