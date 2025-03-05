@@ -1,112 +1,74 @@
 # BewlyCat
-
-English | [官话 - 简体中文](README-cmn_CN.md) | [官話 - 繁體中文](README-cmn_TW.md)
+此项目基于[BewlyBewly](https://github.com/BewlyBewly/BewlyBewly)开发，并在其基础上进行功能扩充和调整，并合并了一些其他拓展的功能。
 
 <p align="center" style="margin-bottom: 0px !important;">
 <img width="300" alt="BewlyBewly icon" src="https://cdn.jsdelivr.net/gh/BewlyBewly/Imgs/logos/bewlybewly-vtuber-logo.png"><br/>
 </p>
 
-<p align="center">Just make a few small changes to your Bilibili homepage.</p>
+<p align="center">只需对您的 Bilibili 主页进行一些小更改即可。</p>
 
-<!-- ![min1](https://github.com/hakadao/BewlyBewly/assets/33394391/951f9e2a-d0e1-452c-83a9-dc6d85c4d441)
-![min2](https://github.com/hakadao/BewlyBewly/assets/33394391/3e75dd20-f60b-4645-b434-23a24c72959c) -->
-
-## 👋 Introduction
-
-> [!NOTE]
-> 此项目基于BewlyBewly开发，并在其基础上进行功能扩充和调整，并合并了一些其他拓展的功能。
+## 👋 介绍
 
 > [!IMPORTANT]
-> BewlyBewly mainly focuses on page adjustments and optimization rather than improving functionally and efficiency.
->
-> The dark mode will only be adapted to commonly used pages due to its efficiency and maintenance difficulty, while less
-> frequently used pages will not to be adapted.
+> 该项目面向我个人使用习惯修改。当然，欢迎功能建议与bug反馈。
+> 不会打包firefox和safari，如果有需要欢迎自行打包。
 
 > [!CAUTION]
-> [BLBewly](https://apps.apple.com/us/app/blbewly/id6742200021) is a free BewlyBewly extension on Safari. We thank [𝗦𝘁𝗲𝘃𝗲 𝕏](https://x.com/st7evechou) for their help with the free publication of the app to Safari.
-> However, issues encountered with the Safari version are outside of our maintenance scope,
-> and we are not considering Safari maintenance.
+> 本插件移除了原插件的`tabs`权限改用了`activeTab`权限，目前我个人使用功能并未受到影响，不确定是否会造成BUG。
 
-> [!CAUTION]
-> If you are installing this extension, your browser will probably say that it can read your browser history.
->
-> This is because BewlyBewly uses the ["tabs" permission](https://developer.chrome.com/docs/extensions/reference/api/tabs), which can also be used to read each tab, allowing it to know the browsing history, but it is not utilized here.
->
-> **Some browsers will mention the worst-case scenario and the highest risks, ensuring your safety after installation.**
-> Additionally, this project is open source, so you can see what exactly what it does.
+## ⬇️ 安装
 
-BewlyBewly is a browser extension for BiliBili that aims to enhance the user experience by redesigning the BiliBili UI.
-The design is inspired by YouTube, Vision OS, and iOS, resulting in a more visually appealing and user-friendly interface.
-This project uses the [vitesse-webext](https://github.com/antfu/vitesse-webext) template for development.
-Without this template, it may not be possible to develop this project.
-
-## ⬇️ Installation
-
-### Online Installation
+### 在线安装
 
 > [!TIP]
-> Even in the Edge browser, we strongly recommend you install it in the Chrome web store.
-> In terms of review speed, the Chrome web store is faster than Edge Add-ons.
->
-> Additionally, the Chrome Web Store version of BewlyBewly will address and fix critical bugs more quickly.
+> 当前等待Chrome商店审核中，审核通过后会在Chrome商店发布。（目前也是使用有限范围发布）
 
-- Chrome: <https://chromewebstore.google.com/detail/bewlybewly/bbbiejemhfihiooipfcjmjmbfdmobobp>
-- Edge: <https://chromewebstore.google.com/detail/bewlybewly/bbbiejemhfihiooipfcjmjmbfdmobobp>
-- Firefox: <https://addons.mozilla.org/en-US/firefox/addon/bewlybewly/>
+### 本地安装
 
-#### To Firefox users
+[CI](https://github.com/keleus/BewlyCat/actions)：使用最新代码自动构建
 
-> [!WARNING]
-> When using the Firefox browser, remember to enable all permissions shown in the picture below for normal use of BewlyBewly
+[Releases](https://github.com/keleus/BewlyCat/releases)：稳定版
 
-<br/> <img width="655" alt="enable all bewlybewly permissions on firefox" src="https://github.com/hakadao/BewlyBewly/assets/33394391/9566aed8-040a-4435-a2ec-c61117f8e429">
+#### Edge 和 Chrome（推荐）
 
-### Local Installation
+> 确保您下载了 [extension.zip](https://github.com/keleus/BewlyCat/releases)。
 
-[CI](https://github.com/hakadao/BewlyBewly/actions): Automatically build with the latest code
-
-[Releases](https://github.com/hakadao/BewlyBewly/releases): Stable version
-
-#### Edge & Chrome (RECOMMENDED)
-
-> Ensure you installed [extension.zip](https://github.com/hakadao/BewlyBewly/releases) .
-
-Opening the `edge://extensions` page in the Edge or `chrome://extensions` page in Chrome,
-simply drag and drop the downloaded `extension.zip` file into the browser to complete the installation.
+在 Edge 浏览器中打开 `edge://extensions` 或者在 Chrome 浏览器中打开 `chrome://extensions` 界面，只需将下载的 `extension.zip` 文件拖放到浏览器中即可完成安装。
 
 <details>
- <summary> Another installation method for Edge & Chrome </summary>
+ <summary> Edge & Chrome 的另一种安装方法 </summary>
 
 #### Edge
 
-> Ensure you installed [extension.zip](https://github.com/hakadao/BewlyBewly/releases) and decompress this file.
+> 确保您下载了 [extension.zip](https://github.com/keleus/BewlyCat/releases) 并解压缩该文件。
 
-1. Type in `edge://extensions/` in the address bar and press Enter
-2. Turn on `Developer mode` then press `Load Unpacked` <br/> <img width="655" alt="image" src="https://user-images.githubusercontent.com/33394391/232246901-e3544c16-bde2-480d-b770-ca5242793963.png">
-3. Load the decompressed extension folder in your browser
+1. 在地址栏输入 `edge://extensions/` 并按回车
+2. 打开 `开发者模式` 并点击 `加载已解压的拓展程序` <br/> <img width="655" alt="image" src="https://user-images.githubusercontent.com/33394391/232246901-e3544c16-bde2-480d-b770-ca5242793963.png">
+3. 在浏览器中加载解压后的扩展文件夹
 
 #### Chrome
->
-> Ensure you installed [extension.zip](https://github.com/hakadao/BewlyBewly/releases) and decompress this file.
 
-1. Type in `chrome://extensions/` in the address bar and press Enter
-2. Turn on `Developer mode` then press `Load Unpacked` <br/> <img width="655" alt="Snipaste_2022-03-27_18-17-04" src="https://user-images.githubusercontent.com/33394391/160276882-13da0484-92c1-47dd-add8-7655c5c2bf1c.png">
-3. Load the decompressed extension folder in your browser
+> 确保您下载了 [extension.zip](https://github.com/keleus/BewlyCat/releases) 并解压缩该文件。
+
+1. 在地址栏输入 `chrome://extensions/` 并按回车
+2. 打开 `开发者模式` 并点击 `加载已解压的拓展程序` <br/> <img width="655" alt="Snipaste_2022-03-27_18-17-04" src="https://user-images.githubusercontent.com/33394391/160276882-13da0484-92c1-47dd-add8-7655c5c2bf1c.png">
+3. 在浏览器中加载解压后的扩展文件夹
 
 </details>
 
-## 🤝 Contribution & Build
+## 🤝 构建项目参考
 
-See [CONTRIBUTING.md](docs/CONTRIBUTING.md)
+查看 [CONTRIBUTING.md](docs/CONTRIBUTING-cmn_CN.md)
 
-### Contributors
+### 原BewlyBewly贡献者
 
 [![Contributors](https://contrib.rocks/image?repo=hakadao/BewlyBewly)](https://github.com/BewlyBewly/BewlyBewly/graphs/contributors)
 
-## ❤️ Credits
+## ❤️ 鸣谢
 
-- [vitesse-webext](https://github.com/antfu/vitesse-webext) - The template used for this project
+- [BewlyBewly](https://github.com/BewlyBewly/BewlyBewly) - 该项目的基础
+- [vitesse-webext](https://github.com/antfu/vitesse-webext) - 该项目使用的模板
 - [UserScripts/bilibiliHome](https://github.com/indefined/UserScripts/tree/master/bilibiliHome),
-[bilibili-app-recommend](https://github.com/magicdawn/bilibili-app-recommend) - Reference source for obtaining the access key
-- [Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved) - Partial implementation of functionalities
+[bilibili-app-recommend](https://github.com/magicdawn/bilibili-app-recommend) - 获取访问密钥的参考来源
+- [Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved) - 部分功能实现
 - [bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
