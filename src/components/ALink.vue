@@ -53,7 +53,8 @@ function handleClick(event: MouseEvent) {
 
   if (openMode.value === 'drawer') {
     event.preventDefault()
-    openIframeDrawer(props.href)
+    if (props.href)
+      openIframeDrawer(props.href)
     return
   }
 
