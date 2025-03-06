@@ -2,7 +2,7 @@
 此项目基于[BewlyBewly](https://github.com/BewlyBewly/BewlyBewly)开发，并在其基础上进行功能扩充和调整，并合并了一些其他拓展的功能。
 
 <p align="center" style="margin-bottom: 0px !important;">
-<img width="300" alt="BewlyBewly icon" src="https://cdn.jsdelivr.net/gh/BewlyBewly/Imgs/logos/bewlybewly-vtuber-logo.png"><br/>
+<img width="300" alt="BewlyCat icon" src="https://cdn.jsdelivr.net/gh/keleus/BewlyCat/assets/icon-512.png"><br/>
 </p>
 
 <p align="center">只需对您的 Bilibili 主页进行一些小更改即可。</p>
