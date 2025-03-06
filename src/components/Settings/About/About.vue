@@ -114,7 +114,7 @@ async function checkGitHubRelease() {
       </div>
       <section text-2xl text-center mt-2>
         <p flex="inline gap-2" fw-900>
-          <span>BewlyBewly</span>
+          <span>BewlyCat</span>
           <span
             v-if="isDev"
             inline-block text="$bew-warning-color"

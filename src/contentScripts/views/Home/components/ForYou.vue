@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onKeyStroke } from '@vueuse/core'
 import type { Ref } from 'vue'
+import { useToast } from 'vue-toastification'
 
 import { useBewlyApp } from '~/composables/useAppProvider'
 import { FilterType, useFilter } from '~/composables/useFilter'
@@ -22,6 +23,8 @@ const emit = defineEmits<{
   (e: 'beforeLoading'): void
   (e: 'afterLoading'): void
 }>()
+
+const toast = useToast()
 
 const filterFunc = useFilter(
   ['is_followed'],
@@ -126,8 +129,17 @@ async function getData() {
       await getRecommendVideos()
     }
     else {
-      for (let i = 0; i < 3; i++)
-        await getAppRecommendVideos()
+      try {
+        for (let i = 0; i < 3; i++)
+          await getAppRecommendVideos()
+      }
+      catch (error) {
+        console.error('App recommendation failed:', error)
+        // 切换到 web 模式并提示用户
+        settings.value.recommendationMode = 'web'
+        toast.error('App 推荐数据加载失败，已自动切换至 Web 模式')
+        await getRecommendVideos()
+      }
     }
   }
   finally {
