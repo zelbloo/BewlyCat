@@ -122,7 +122,7 @@ export const originalSettings: Settings = {
   enableHorizontalScrolling: false,
   enableSettingsSync: false,
   language: '',
-  customizeFont: 'recommend',
+  customizeFont: 'default',
   fontFamily: '',
   overrideDanmakuFont: true,
   removeTheIndentFromChinesePunctuation: false,
