@@ -57,8 +57,10 @@
     "unocss",
     "Vitesse",
     "vitesse-webext",
+    "vueuse",
     "WATCHLATER",
-    "webext"
+    "webext",
+    "webextension"
   ],
   "typescript.tsdk": "node_modules/typescript/lib",
   "vite.autoStart": false,
