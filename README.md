@@ -2,7 +2,7 @@
 此项目基于[BewlyBewly](https://github.com/BewlyBewly/BewlyBewly)开发，并在其基础上进行功能扩充和调整，并合并了一些其他拓展的功能。
 
 <p align="center" style="margin-bottom: 0px !important;">
-<img width="300" alt="BewlyCat icon" src="https://cdn.jsdelivr.net/gh/keleus/BewlyCat/assets/icon-512.png"><br/>
+<img width="300" alt="BewlyCat icon" src="./assets/icon-512.png"><br/>
 </p>
 
 <p align="center">只需对您的 Bilibili 主页进行一些小更改即可。</p>
@@ -11,7 +11,10 @@
 
 > [!IMPORTANT]
 > 该项目面向我个人使用习惯修改。当然，欢迎功能建议与bug反馈。
+>
 > 不会打包firefox和safari，如果有需要欢迎自行打包。
+>
+> 本项目由MIT许可在原项目基础上开发，并亦与原作者联系取得了授权。
 
 > [!CAUTION]
 > 本插件移除了原插件的`tabs`权限改用了`activeTab`权限，目前我个人使用功能并未受到影响，不确定是否会造成BUG。
