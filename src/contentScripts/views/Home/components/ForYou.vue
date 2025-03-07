@@ -28,13 +28,44 @@ const toast = useToast()
 
 const filterFunc = useFilter(
   ['is_followed'],
-  [FilterType.duration, FilterType.viewCount, FilterType.title, FilterType.user, FilterType.user],
-  [['duration'], ['stat', 'view'], ['title'], ['owner', 'name'], ['owner', 'mid']],
+  [
+    FilterType.duration,
+    FilterType.viewCount,
+    FilterType.title,
+    FilterType.user,
+    FilterType.user,
+    FilterType.likeViewRatio, // 添加点赞播放比例过滤
+  ],
+  [
+    ['duration'],
+    ['stat', 'view'],
+    ['title'],
+    ['owner', 'name'],
+    ['owner', 'mid'],
+    ['stat', 'view'], // 添加点赞数和播放数的路径
+  ],
 )
+
+// App模式下的过滤器也需要添加相应的配置
 const appFilterFunc = useFilter(
   ['bottom_rcmd_reason'],
-  [FilterType.filterOutVerticalVideos, FilterType.duration, FilterType.viewCountStr, FilterType.title, FilterType.user, FilterType.user],
-  [['uri'], ['player_args', 'duration'], ['cover_left_text_1'], ['title'], ['mask', 'avatar', 'text'], ['mask', 'avatar', 'up_id']],
+  [
+    FilterType.filterOutVerticalVideos,
+    FilterType.duration,
+    FilterType.viewCountStr,
+    FilterType.title,
+    FilterType.user,
+    FilterType.user,
+    // App模式下暂不添加点赞播放比例过滤，因为需要确认数据结构
+  ],
+  [
+    ['uri'],
+    ['player_args', 'duration'],
+    ['cover_left_text_1'],
+    ['title'],
+    ['mask', 'avatar', 'text'],
+    ['mask', 'avatar', 'up_id'],
+  ],
 )
 
 // https://github.com/starknt/BewlyBewly/blob/fad999c2e482095dc3840bb291af53d15ff44130/src/contentScripts/views/Home/components/ForYou.vue#L16
@@ -68,6 +99,12 @@ const activatedAppVideo = ref<AppVideoItem | null>()
 const videoCardRef = ref(null)
 const showDislikeDialog = ref<boolean>(false)
 const selectedDislikeReason = ref<number>(1)
+
+// 添加请求限制相关的变量
+const requestCount = ref<number>(0)
+const maxRequestsPerSession = 20 // 每个会话最多请求次数
+const requestThrottleTime = 300 // 请求间隔时间(毫秒)
+const lastRequestTime = ref<number>(0)
 const PAGE_SIZE = 30
 
 onKeyStroke((e: KeyboardEvent) => {
@@ -118,26 +155,49 @@ onActivated(() => {
 async function initData() {
   videoList.value.length = 0
   appVideoList.value.length = 0
+  resetRequestLimit() // 添加重置请求限制
   await getData()
 }
 
+// 添加重置请求限制的方法
+function resetRequestLimit() {
+  requestCount.value = 0
+  lastRequestTime.value = 0
+}
+
 async function getData() {
+  // 检查请求次数限制
+  if (requestCount.value >= maxRequestsPerSession) {
+    toast.info('已达到本次会话的请求上限，请刷新页面重试')
+    return
+  }
+
+  // 检查请求频率限制
+  const now = Date.now()
+  if (now - lastRequestTime.value < requestThrottleTime) {
+    toast.info('请求过于频繁，请稍后再试')
+    return
+  }
+
   emit('beforeLoading')
   isLoading.value = true
+  lastRequestTime.value = now
+  requestCount.value++
+
   try {
     if (settings.value.recommendationMode === 'web') {
       await getRecommendVideos()
     }
     else {
       try {
-        for (let i = 0; i < 3; i++)
-          await getAppRecommendVideos()
+        // 限制一次最多请求次数
+        await getAppRecommendVideos()
       }
       catch (error) {
         console.error('App recommendation failed:', error)
         // 切换到 web 模式并提示用户
         settings.value.recommendationMode = 'web'
-        toast.error('App 推荐数据加载失败，已自动切换至 Web 模式')
+        toast.warning('App 推荐数据加载失败，已自动切换至 Web 模式')
         await getRecommendVideos()
       }
     }
@@ -240,7 +300,13 @@ async function getRecommendVideos() {
     if (!needToLoginFirst.value) {
       await nextTick()
       if (!await haveScrollbar() || filledItems.length < PAGE_SIZE || filledItems.length < 1) {
-        getRecommendVideos()
+        // 检查请求次数和频率限制
+        if (requestCount.value < maxRequestsPerSession && (Date.now() - lastRequestTime.value >= requestThrottleTime)) {
+          getRecommendVideos()
+        }
+        else if (requestCount.value >= maxRequestsPerSession) {
+          toast.info('已达到本次会话的请求上限')
+        }
       }
     }
   }
@@ -319,7 +385,13 @@ async function getAppRecommendVideos() {
     if (!needToLoginFirst.value) {
       await nextTick()
       if (!await haveScrollbar() || filledItems.length < PAGE_SIZE || filledItems.length < 1) {
-        getAppRecommendVideos()
+        // 检查请求次数和频率限制
+        if (requestCount.value < maxRequestsPerSession && (Date.now() - lastRequestTime.value >= requestThrottleTime)) {
+          getAppRecommendVideos()
+        }
+        else if (requestCount.value >= maxRequestsPerSession) {
+          toast.info('已达到本次会话的请求上限')
+        }
       }
     }
   }
@@ -329,7 +401,8 @@ function jumpToLoginPage() {
   location.href = 'https://passport.bilibili.com/login'
 }
 
-defineExpose({ initData })
+// 修改 defineExpose，暴露重置方法
+defineExpose({ initData, resetRequestLimit })
 </script>
 
 <template>
