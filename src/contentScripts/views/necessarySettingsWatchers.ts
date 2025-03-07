@@ -20,7 +20,7 @@ export function setupNecessarySettingsWatchers() {
           // use getAcceptLanguages() to get the language code
           const languages: string[] = await browser.i18n.getAcceptLanguages()
           if (languages.includes('zh-HK')) {
-            settings.value.language = LanguageType.Cantonese
+            settings.value.language = LanguageType.Mandarin_CN
           }
           else {
             settings.value.language = LanguageType.Mandarin_TW
@@ -38,9 +38,6 @@ export function setupNecessarySettingsWatchers() {
       }
       else if (locale.value === LanguageType.Mandarin_TW) {
         document.documentElement.lang = 'zh-TW'
-      }
-      else if (locale.value === LanguageType.Cantonese) {
-        document.documentElement.lang = 'zh-HK'
       }
       else {
         document.documentElement.lang = 'en'
