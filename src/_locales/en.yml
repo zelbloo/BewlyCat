@@ -103,7 +103,6 @@ settings:
     english: English
     mandarin_cn: Mandarin - Simplified Chinese
     mandarin_tw: Mandarin - Traditional Chinese
-    jyut: Cantonese
   customize_font: Customize font
   customize_font_opt:
     default: Bilibili Default
@@ -133,7 +132,7 @@ settings:
   link_opening_behavior_opt:
     current_tab: Current tab
     current_tab_if_not_homepage: Current tab if not the homepage, otherwise new tab
-    background: New tab,but in backgoround
+    background: New tab,but in background
     new_tab: New tab
     drawer: Open in drawer
   top_bar_link_opening_behavior: Top bar link opening behavior
