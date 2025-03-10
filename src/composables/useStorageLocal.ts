@@ -37,6 +37,36 @@ const storageSync: StorageLikeAsync = {
   },
 }
 
+// 创建一个同时保存到本地和云端的存储对象
+const storageBoth: StorageLikeAsync = {
+  async removeItem(key: string) {
+    await Promise.all([
+      storageLocal.removeItem(key),
+      storageSync.removeItem(key),
+    ])
+    return Promise.resolve()
+  },
+
+  async setItem<T extends string>(key: string, value: T) {
+    await Promise.all([
+      storageLocal.setItem(key, value),
+      storageSync.setItem(key, value),
+    ])
+    return Promise.resolve()
+  },
+
+  async getItem(key: string): Promise<any | null> {
+    // 优先从同步存储获取数据
+    const syncValue = await storageSync.getItem(key)
+    if (syncValue !== null) {
+      // 确保本地存储也有最新数据
+      await storageLocal.setItem(key, syncValue)
+      return syncValue
+    }
+    return storageLocal.getItem(key)
+  },
+}
+
 export function useStorageLocal<T>(
   key: string,
   initialValue: MaybeRef<T>,
@@ -47,16 +77,27 @@ export function useStorageLocal<T>(
     if (key === 'settings') {
       const result = await storage.local.get('settings')
       const settings = result.settings as Settings
-      return settings?.enableSettingsSync ? storageSync : storageLocal
+      return settings?.enableSettingsSync ? storageBoth : storageLocal
     }
     return storageLocal
   }
 
-  // 初始化时获取存储区域
-  getCurrentStorage().then((storageArea) => {
-    return useStorageAsync(key, initialValue, storageArea, options)
-  })
+  // 创建一个代理存储对象
+  const proxyStorage: StorageLikeAsync = {
+    async removeItem(key: string) {
+      const currentStorage = await getCurrentStorage()
+      return currentStorage.removeItem(key)
+    },
+    async setItem(key: string, value: any) {
+      const currentStorage = await getCurrentStorage()
+      return currentStorage.setItem(key, value)
+    },
+    async getItem(key: string): Promise<any | null> {
+      const currentStorage = await getCurrentStorage()
+      return currentStorage.getItem(key)
+    },
+  }
 
-  // 默认使用本地存储，等待异步决定是否切换到同步存储
-  return useStorageAsync(key, initialValue, storageLocal, options)
+  // 使用代理存储对象
+  return useStorageAsync(key, initialValue, proxyStorage, options)
 }
