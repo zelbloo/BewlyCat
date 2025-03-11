@@ -51,13 +51,22 @@
   ],
 
   "cSpell.words": [
-    "WATCHLATER",
+    "bangumi",
     "bewly",
+    "bili",
     "bilibili",
+    "Danmaku",
+    "danmakus",
+    "owari",
+    "prismjs",
+    "topbar",
     "unocss",
     "Vitesse",
+    "vitesse-webext",
+    "vueuse",
+    "WATCHLATER",
     "webext",
-    "vitesse-webext"
+    "webextension"
   ],
   "typescript.tsdk": "node_modules/typescript/lib",
   "vite.autoStart": false,

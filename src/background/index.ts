@@ -3,6 +3,7 @@ import browser from 'webextension-polyfill'
 import { setupApiMsgLstnrs } from './messageListeners/api'
 import { setupTabMsgLstnrs } from './messageListeners/tabs'
 
+// Initialize extension and set up message handlers
 browser.runtime.onInstalled.addListener(async () => {
   // eslint-disable-next-line no-console
   console.log('Extension installed')
@@ -12,6 +13,7 @@ function isExtensionUri(url: string) {
   return new URL(url).origin === new URL(browser.runtime.getURL('')).origin
 }
 
+// Firefox specific header handling
 // eslint-disable-next-line node/prefer-global/process
 if (process.env.FIREFOX) {
   browser.webRequest.onBeforeSendHeaders.addListener(
@@ -41,5 +43,6 @@ if (process.env.FIREFOX) {
 }
 
 // Setup all message listeners
+// 只设置一次消息监听器
 setupApiMsgLstnrs()
 setupTabMsgLstnrs()

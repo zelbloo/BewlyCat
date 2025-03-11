@@ -11,6 +11,10 @@ import emitter from '~/utils/mitt'
 import type { GridLayoutIcon } from './types'
 import { HomeSubPage } from './types'
 
+const emit = defineEmits<{
+  (e: 'settingsVisibilityChange'): void
+
+}>()
 const mainStore = useMainStore()
 const { handleBackToTop, scrollbarRef } = useBewlyApp()
 const handleThrottledBackToTop = useThrottleFn((targetScrollTop: number = 0) => handleBackToTop(targetScrollTop), 1000)
@@ -238,24 +242,46 @@ function toggleTabContentLoading(loading: boolean) {
           </OverlayScrollbarsComponent>
         </section>
 
-        <div
-          v-if="settings.enableGridLayoutSwitcher"
-          style="backdrop-filter: var(--bew-filter-glass-1)"
-          flex="~ gap-1 shrink-0" p-1 h-38px bg="$bew-elevated" transform-gpu
-          ml-auto rounded-full
-          shadow="[var(--bew-shadow-1),var(--bew-shadow-edge-glow-1)]"
-          box-border border="1 $bew-border-color"
-        >
+        <div flex="~ gap-2 shrink-0">
+          <!-- 新增设置按钮 -->
           <div
-            v-for="icon in gridLayoutIcons" :key="icon.value"
-            :class="{ 'grid-layout-item-activated': gridLayout.home === icon.value }"
-            flex="~ justify-center items-center"
-            h-full aspect-square text="$bew-text-2 hover:$bew-text-1"
-            rounded-full bg="hover:$bew-fill-2" duration-300
-            cursor-pointer
-            @click="gridLayout.home = icon.value"
+            style="backdrop-filter: var(--bew-filter-glass-1)"
+            flex="~ gap-1 shrink-0" p-1 h-38px bg="$bew-elevated" transform-gpu
+            rounded-full
+            shadow="[var(--bew-shadow-1),var(--bew-shadow-edge-glow-1)]"
+            box-border border="1 $bew-border-color"
           >
-            <div :class="gridLayout.home === icon.value ? icon.iconActivated : icon.icon" text-base />
+            <div
+              flex="~ justify-center items-center"
+              h-full aspect-square text="$bew-text-2 hover:$bew-text-1"
+              rounded-full bg="hover:$bew-fill-2" duration-300
+              cursor-pointer
+              @click="emit('settingsVisibilityChange')"
+            >
+              <div i-mingcute:settings-3-line text-base />
+            </div>
+          </div>
+
+          <!-- 原有的 gridLayout 切换器 -->
+          <div
+            v-if="settings.enableGridLayoutSwitcher"
+            style="backdrop-filter: var(--bew-filter-glass-1)"
+            flex="~ gap-1 shrink-0" p-1 h-38px bg="$bew-elevated" transform-gpu
+            rounded-full
+            shadow="[var(--bew-shadow-1),var(--bew-shadow-edge-glow-1)]"
+            box-border border="1 $bew-border-color"
+          >
+            <div
+              v-for="icon in gridLayoutIcons" :key="icon.value"
+              :class="{ 'grid-layout-item-activated': gridLayout.home === icon.value }"
+              flex="~ justify-center items-center"
+              h-full aspect-square text="$bew-text-2 hover:$bew-text-1"
+              rounded-full bg="hover:$bew-fill-2" duration-300
+              cursor-pointer
+              @click="gridLayout.home = icon.value"
+            >
+              <div :class="gridLayout.home === icon.value ? icon.iconActivated : icon.icon" text-base />
+            </div>
           </div>
         </div>
       </header>

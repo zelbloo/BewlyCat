@@ -547,7 +547,7 @@ defineExpose({
               rounded="46px" duration-300
               w-46px h-46px transform-gpu
               bg="hover:$bew-theme-color"
-              @click="event => handleClickTopBarItem(event, 'channels')"
+              @click="(event: MouseEvent) => handleClickTopBarItem(event, 'channels')"
             >
               <svg
                 t="1720198072316" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
@@ -638,7 +638,7 @@ defineExpose({
                   ref="moments"
                   class="right-side-item"
                   :class="{ active: popupVisible.moments }"
-                  @click="event => handleClickTopBarItem(event, 'moments')"
+                  @click="(event: MouseEvent) => handleClickTopBarItem(event, 'moments')"
                 >
                   <template v-if="newMomentsCount > 0">
                     <div
@@ -676,7 +676,7 @@ defineExpose({
                   ref="favorites"
                   class="right-side-item"
                   :class="{ active: popupVisible.favorites }"
-                  @click="event => handleClickTopBarItem(event, 'favorites')"
+                  @click="(event: MouseEvent) => handleClickTopBarItem(event, 'favorites')"
                 >
                   <ALink
                     :class="{ 'white-icon': forceWhiteIcon }"
@@ -704,7 +704,7 @@ defineExpose({
                   ref="history"
                   class="right-side-item"
                   :class="{ active: popupVisible.history }"
-                  @click="event => handleClickTopBarItem(event, 'history')"
+                  @click="(event: MouseEvent) => handleClickTopBarItem(event, 'history')"
                 >
                   <ALink
                     :class="{ 'white-icon': forceWhiteIcon }"
@@ -730,7 +730,7 @@ defineExpose({
                   ref="watchLater"
                   class="right-side-item"
                   :class="{ active: popupVisible.watchLater }"
-                  @click="event => handleClickTopBarItem(event, 'watchLater')"
+                  @click="(event: MouseEvent) => handleClickTopBarItem(event, 'watchLater')"
                 >
                   <ALink
                     :class="{ 'white-icon': forceWhiteIcon }"
@@ -769,7 +769,7 @@ defineExpose({
                 ref="more"
                 class="right-side-item lg:!hidden flex"
                 :class="{ active: popupVisible.more }"
-                @click="event => handleClickTopBarItem(event, 'more')"
+                @click="(event: MouseEvent) => handleClickTopBarItem(event, 'more')"
               >
                 <a
                   :class="{ 'white-icon': forceWhiteIcon }"
@@ -801,7 +801,7 @@ defineExpose({
                   ref="upload"
                   class="right-side-item"
                   :class="{ active: popupVisible.upload }"
-                  @click="event => handleClickTopBarItem(event, 'upload')"
+                  @click="(event: MouseEvent) => handleClickTopBarItem(event, 'upload')"
                 >
                   <a
                     class="upload"
@@ -829,7 +829,7 @@ defineExpose({
                   ref="notifications"
                   class="right-side-item"
                   :class="{ active: popupVisible.notifications }"
-                  @click="event => handleClickTopBarItem(event, 'notifications')"
+                  @click="(event: MouseEvent) => handleClickTopBarItem(event, 'notifications')"
                 >
                   <template v-if="unReadMessageCount > 0">
                     <div
@@ -876,7 +876,7 @@ defineExpose({
               ref="avatar"
               :class="{ hover: popupVisible.userPanel }"
               class="avatar right-side-item"
-              @click="event => handleClickTopBarItem(event, 'userPanel')"
+              @click="(event: MouseEvent) => handleClickTopBarItem(event, 'userPanel')"
             >
               <ALink
                 ref="avatarImg"

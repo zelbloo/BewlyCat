@@ -21,7 +21,6 @@ common:
   added: Added
   performance_impact_warn: This feature may cause performance *DECREASE*!
   no_more_content: No more content now, owari da
-
   operation:
     add: Add
     edit: Edit
@@ -34,29 +33,23 @@ common:
     reset: Reset
     import: Import
     export: Export
-
   table:
     index: Index
     title: Title
     name: Name
     remark: Remark
     operations: Operations
-
   position:
     left: Left
     right: Right
     top: Top
     bottom: Bottom
-
 iframe_drawer:
   open_in_new_tab: Open in new tab
   close: Close
   press_esc_again_to_close: Press Esc again to close
-
 settings:
   title: Settings
-
-  # Settings menu
   menu_general: General
   menu_desktop_and_dock: Desktop & Dock
   menu_appearance: Appearance
@@ -65,8 +58,6 @@ settings:
   menu_home: Home
   menu_compatibility: Compatibility
   menu_about: About
-
-  # Settings group
   group_common: Common
   group_languages_and_fonts: Languages & Fonts
   group_link_opening_behavior: Link Opening Behavior
@@ -75,93 +66,94 @@ settings:
   group_topbar: Top Bar
   group_dock: Dock
   group_sidebar: Sidebar
-  group_sidebar_desc: Located on the right or left side of pages other than the homepage, typically includes a light/dark mode toggle button and settings button.
+  group_sidebar_desc: >-
+    Located on the right or left side of pages other than the homepage,
+    typically includes a light/dark mode toggle button and settings button.
   group_color: Color
   group_wallpaper: Wallpaper
   group_logo: LOGO
   group_search_bar: Search Bar
-  group_recommendation_mode: |-
-    "For you" Recommendation Mode
-  group_recommendation_filters: |-
-    "For you" Recommendation Filters
-  group_recommendation_filters_desc: |
-    Do not set the restricted value too large, as this may increase loading time!
+  group_recommendation_mode: '"For you" Recommendation Mode'
+  group_recommendation_filters: '"For you" Recommendation Filters'
+  group_recommendation_filters_desc: >
+    Do not set the restricted value too large, as this may increase loading
+    time!
   group_following: Following
   group_search_page_mode: Search Page Mode
   group_home_tabs: Home Tabs
-
-  # Settings buttons
   btn:
     authorize: Authorize
     revoke: Revoke
     open_settings: Open Settings...
-
-  # General
   touch_screen_optimization: Touch screen optimization
   touch_screen_optimization_desc: >
-    After this setting is turned on, like the top bar, you must click on items to view more information instead of hovering over them. (This feature is not supported by the old top bar.)
+    After this setting is turned on, like the top bar, you must click on items
+    to view more information instead of hovering over them. (This feature is not
+    supported by the old top bar.)
   chk_box:
     show: Show
     hidden: Hidden
   enable_grid_layout_switcher: Enable grid layout switcher
   enable_horizontal_scrolling: Enable horizontal scrolling
-  enable_horizontal_scrolling_desc: After enabling, mouse scrolling will directly scroll the horizontal scroll list.
-
+  enable_horizontal_scrolling_desc: >-
+    After enabling, mouse scrolling will directly scroll the horizontal scroll
+    list.
   select_language: Language
   select_language_opt:
     english: English
     mandarin_cn: Mandarin - Simplified Chinese
     mandarin_tw: Mandarin - Traditional Chinese
-    jyut: Cantonese
   customize_font: Customize font
   customize_font_opt:
     default: Bilibili Default
     recommend: Recommend
     custom: Custom
-  customize_font_desc: |-
-    For users who favor the old form of Chinese characters, we recommend <a class="link" href="https://github.com/GuiWonder/Shanggu" target="_blank">Shanggu Fonts (尚古字型)</a> and <a class="link" href="https://github.com/ayaka14732/FanWunHak" target="_blank">Fan Wun Hak (繁媛黑體)</a>.
-    These fonts also possess the capability to convert simplified Chinese into traditional characters.
+  customize_font_desc: >-
+    For users who favor the old form of Chinese characters, we recommend <a
+    class="link" href="https://github.com/GuiWonder/Shanggu"
+    target="_blank">Shanggu Fonts (尚古字型)</a> and <a class="link"
+    href="https://github.com/ayaka14732/FanWunHak" target="_blank">Fan Wun Hak
+    (繁媛黑體)</a>.
+
+    These fonts also possess the capability to convert simplified Chinese into
+    traditional characters.
   override_danmaku_font: Override danmaku font
   override_danmaku_font_desc: >
-    Set the danmaku font to your customized font to override the default. The video player won't be able to change it afterwards.
+    Set the danmaku font to your customized font to override the default. The
+    video player won't be able to change it afterwards.
   remove_the_indent_from_chinese_punctuation: Remove the indent from Chinese punctuation
   remove_the_indent_from_chinese_punctuation_desc: >
-    By default, Bilibili will specifically handle Chinese punctuation to achieve left alignment.
-    If you are using a custom font, it is recommended to remove the indent.
-
+    By default, Bilibili will specifically handle Chinese punctuation to achieve
+    left alignment. If you are using a custom font, it is recommended to remove
+    the indent.
   disable_frosted_glass: Disable frosted glass effect
   reduce_frosted_glass_blur: Reduce the intensity of the frosted glass blur
   disable_shadow: Disable shadow
-
   link_opening_behavior_opt:
     current_tab: Current tab
     current_tab_if_not_homepage: Current tab if not the homepage, otherwise new tab
-    background: New tab,but in backgoround
+    background: New tab,but in background
     new_tab: New tab
     drawer: Open in drawer
   top_bar_link_opening_behavior: Top bar link opening behavior
   video_card_link_opening_behavior: Video card and bangumi card link opening behavior
   search_bar_link_opening_behavior: Search bar link opening behavior
   close_drawer_without_pressing_esc_again: Close the drawer without pressing <kbd>Esc</kbd> again
-
   block_ads: Block ads
   block_top_search_page_ads: Block Bilibili top search page ads
   block_top_search_page_ads_desc: >
-    Sometimes, the ads above search results are actually year-end summaries or annual reports.
-    If you don't want these to be accidentally removed, please disable this option.
-
+    Sometimes, the ads above search results are actually year-end summaries or
+    annual reports. If you don't want these to be accidentally removed, please
+    disable this option.
   video_default_player_mode: Default video display mode
   video_player_mode:
     default: Default
     fullscreen: Fullscreen
     web_fullscreen: Web Fullscreen
     widescreen: Widescreen
-
   enable_video_preview: Enable video preview feature (if possible)
   enable_video_ctrl_bar_on_video_card: Display the video control bar on the video card
   hover_video_card_delayed: Delayed video preview on hover over the video card
-
-  # Desktop & Dock
   use_old_top_bar: Use the old top bar
   auto_hide_top_bar: Automatically hide the top bar
   show_top_bar_theme_color_gradient: Show theme color gradient in top bar (only works in dark mode)
@@ -173,9 +165,10 @@ settings:
     dot: Dot
     none: Do not show
   open_notifications_page_as_drawer: Open the notifications page as a drawer
-
   always_use_dock: Always use the dock
-  always_use_dock_desc: The dock will always be visible and the sidebar will be hidden. We also recommend enabling auto-hide for the dock.
+  always_use_dock_desc: >-
+    The dock will always be visible and the sidebar will be hidden. We also
+    recommend enabling auto-hide for the dock.
   auto_hide_dock: Automatically hide the dock
   half_hide_dock: Half-hide dock
   dock_position: Dock position
@@ -189,8 +182,6 @@ settings:
   back_to_top_and_refresh_buttons_are_separated: Separate Back to Top and Refresh Buttons
   sidebar_position: Sidebar position
   auto_hide_sidebar: Automatically hide the sidebar
-
-  # Appearance
   theme: Theme
   theme_opt:
     light: Light
@@ -199,24 +190,29 @@ settings:
   theme_color: Theme color
   gradient_theme_color_background: Use a gradient theme color as the background in dark mode
   wallpaper_mode: Wallpaper mode
-  wallpaper_mode_desc: 'By URL: Choose an image from the Internet and use its URL to set it as the wallpaper.'
+  wallpaper_mode_desc: >-
+    By URL: Choose an image from the Internet and use its URL to set it as the
+    wallpaper.
   wallpaper_mode_opt:
     build_in: Built-in
     by_url: By URL
   choose_ur_wallpaper: Choose your wallpaper
   image_url: Image URL
-  image_url_hint: |-
-    URL examples: https://cdn.jsdelivr.net/gh/BewlyBewly/Imgs/wallpapers/rocky-mountain-cloudscape.jpg
+  image_url_hint: >-
+    URL examples:
+    https://cdn.jsdelivr.net/gh/BewlyBewly/Imgs/wallpapers/rocky-mountain-cloudscape.jpg
+
     https://cdn.jsdelivr.net/gh/BewlyBewly/Imgs/wallpapers/green-white-mountains.jpg
   enable_wallpaper_masking: Enable wallpaper masking
   wallpaper_mask_opacity: Wallpaper masking opacity
   wallpaper_blur_intensity: Wallpaper blur intensity
   customize_css: Customize CSS
-  customize_css_desc: |-
-    If you are unfamiliar with CSS, please DO NOT modify CSS. Doing so may cause unexpected display issues.
-    If you encounter any problems after modifying CSS, please reinstall BewlyBewly.
+  customize_css_desc: >-
+    If you are unfamiliar with CSS, please DO NOT modify CSS. Doing so may cause
+    unexpected display issues.
 
-  # Search page
+    If you encounter any problems after modifying CSS, please reinstall
+    BewlyBewly.
   logo_color: Logo color
   logo_color_opt:
     white: White
@@ -227,21 +223,24 @@ settings:
   bg_blurs_when_the_search_bar_is_focused: Background blurs when the search bar is focused
   choose_search_bar_focused_character: Choose the character that appears when the search bar is focused
   individually_set_search_page_wallpaper: Individually set search page wallpaper
-
-  # Home
   recommendation_mode: Recommendation mode
   recommendation_mode_desc: >
-    If you want to use the recommendation algorithm on the app, please ensure that you authorize the BewlyBewly to use the access key first.
+    If you want to use the recommendation algorithm on the app, please ensure
+    that you authorize the BewlyBewly to use the access key first.
   authorize_app: Authorize the BewlyBewly to use the access key
   authorize_app_desc: >
-    After authentication, you will receive the video recommendations based on the bilibili app recommendation algorithm.
-    The access key is valid for about one month. After that, remember to re-authorize the BewlyBewly to use the access key.
+    After authentication, you will receive the video recommendations based on
+    the bilibili app recommendation algorithm. The access key is valid for about
+    one month. After that, remember to re-authorize the BewlyBewly to use the
+    access key.
   authorize_app_more_info_access_key: More information about the access key
-  scan_qrcode_desc: Use the Bilibili mobile app to scan this QR code in order to authorize the access key.
-
+  scan_qrcode_desc: >-
+    Use the Bilibili mobile app to scan this QR code in order to authorize the
+    access key.
   disable_filters_for_followed_users: Disable filters for followed users
   disable_filters_for_followed_users_desc: >
-    If you enable this option, all filters you set will be disabled for the users you follow.
+    If you enable this option, all filters you set will be disabled for the
+    users you follow.
   filter_out_vertical_videos: Filter out vertical videos (only works on the app recommendation mode)
   filter_by_view_count: Filter by view count
   filter_by_view_count_desc: Filtered out videos with less than the view count you set.
@@ -251,26 +250,39 @@ settings:
   filter_by_duration_unit: sec
   filter_item_already_exist: This filter item already exists!
   filter_by_title: Filter by title
-  filter_by_title_desc: |-
+  filter_by_title_desc: >-
     Filtered out the videos that contain the titles you set (case-insensitive).
-    Alternatively, use regex, such as <code>/abc&#124;\d+/</code>, wrapped in <code>/</code>.
+
+    Alternatively, use regex, such as <code>/abc&#124;\d+/</code>, wrapped in
+    <code>/</code>.
+
     <br/>
-    In the table below, you can press the <kbd>Enter</kbd> key to add a new filter or confirm a modification.
+
+    In the table below, you can press the <kbd>Enter</kbd> key to add a new
+    filter or confirm a modification.
+
     Press the <kbd>Esc</kbd> key to cancel the modification.
+
     Double-click the column to edit the current column.
   filter_by_user: Filter by user
-  filter_by_user_desc: |-
-    Filtered out the videos that are uploaded by the username (full name, case-insensitive) or MID you set.
-    Alternatively, use regex, such as <code>/abc&#124;\d+/</code>, wrapped in <code>/</code>.
+  filter_by_user_desc: >-
+    Filtered out the videos that are uploaded by the username (full name,
+    case-insensitive) or MID you set.
+
+    Alternatively, use regex, such as <code>/abc&#124;\d+/</code>, wrapped in
+    <code>/</code>.
+
     <br/>
-    In the table below, you can press the <kbd>Enter</kbd> key to add a new filter or confirm a modification.
+
+    In the table below, you can press the <kbd>Enter</kbd> key to add a new
+    filter or confirm a modification.
+
     Press the <kbd>Esc</kbd> key to cancel the modification.
+
     Double-click the column to edit the current column.
   filter_by_user_table:
     username_or_mid: Username / MID
-
   following_tab_show_livestreaming_videos: Show Live-streaming videos in the "Following" tab
-
   use_search_page_mode: Use search page mode on homepage
   settings_shared_with_the_search_page: Settings shared with the search page
   settings_shared_with_the_search_page_desc: Those settings are used in common with the search page.
@@ -278,48 +290,56 @@ settings:
   home_tabs_adjustment: Tabs adjustment
   home_tabs_adjustment_desc: The first activated tab is the default page.
   always_show_tabs_on_home_page: Always show tabs on the home page
-
-  # Compatibility
-  # Common
   topbar_visibility: BewlyBewly's top bar visibility
-  topbar_visibility_desc: If you are using Bilibili Evolved's top bar, you can turn BewlyBewly's top bar off here.
+  topbar_visibility_desc: >-
+    If you are using Bilibili Evolved's top bar, you can turn BewlyBewly's top
+    bar off here.
   use_original_bilibili_homepage: Use the original Bilibili homepage
-  use_original_bilibili_homepage_desc: After you change it, the page will automatically refresh if you are on the homepage!
+  use_original_bilibili_homepage_desc: >-
+    After you change it, the page will automatically refresh if you are on the
+    homepage!
   use_original_bilibili_topbar: Use the original Bilibili top bar
   adapt_to_other_page_styles: Adapt to other page styles
   adapt_to_other_page_styles_desc: Adapt to some common pages to match with the BewlyBewly theme.
-  # Bilibili Evolved
   follow_bilibili_evolved_color: Follow the Bilibili Evolved theme color
-  follow_bilibili_evolved_color_desc: After changing the theme color in Bilibili Evolved, you will need to re-select this option in order to update the theme color.
-
-  # About
+  follow_bilibili_evolved_color_desc: >-
+    After changing the theme color in Bilibili Evolved, you will need to
+    re-select this option in order to update the theme color.
   links: Links
   sponsor: Sponsor
-  sponsor_desc: If you like this project and would like to see it glow, please consider sponsoring it. Your support is the driving force behind the project's development.
+  sponsor_desc: >-
+    If you like this project and would like to see it glow, please consider
+    sponsoring it. Your support is the driving force behind the project's
+    development.
   afdian: Afdian
   import_settings: Import Settings
   export_settings: Export Settings
-  export_settings_desc: Some sensitive content, such as access key, will not be exported and may need to be reacquired again.
+  export_settings_desc: >-
+    Some sensitive content, such as access key, will not be exported and may
+    need to be reacquired again.
   reset_settings: Reset Settings
-  reset_settings_confirm: |-
+  reset_settings_confirm: >-
     Reset settings?
-    This operation cannot be reversed. Are you sure you want to reset your settings?
 
+    This operation cannot be reversed. Are you sure you want to reset your
+    settings?
   safari_helpers: Those who helped with publishing to the Safari store
   safari_helpers_desc1: Submit PR to support Safari
   safari_helpers_desc2: Help publish on Safari for free
   safari_helpers_desc3: Help answer Apple developer registration questions
   safari_helpers_desc4: Help answer Apple developer registration questions
-
-  contributors: Contributors
-
+  contributors: BewlyBewly History Contributors
+  enable_settings_sync: Allow syncing settings
+  enable_settings_sync_desc: >-
+    Sync extension settings across different devices (requires signing into the
+    browser account)
+  filter_like_view_ratio: Filter by like-to-play ratio
+  filter_like_view_ratio_desc: Filter out videos with a like-to-play ratio lower than 1:10.
 auth:
   auth_access_key_first: Before doing this, authorize BewlyBewly to use the access key.
-
 topbar:
   switch_to_bewly_top_bar: Switch to BewlyBewly top bar
   switch_to_bili_top_bar: Switch to BiliBili/Bilibili-Evolved top bar
-
   sign_in: Sign in
   notifications: Notifications
   moments: Moments
@@ -403,7 +423,6 @@ topbar:
     sticker: Sticker
     video: Video
     manager: Manager
-
 dock:
   search: Search
   home: Home
@@ -415,7 +434,6 @@ dock:
   dark_mode: Dark Mode
   light_mode: Light Mode
   settings: Settings
-
 video_card:
   operation:
     not_interested: Not Interested
@@ -424,33 +442,29 @@ video_card:
     open_in_new_window: Open in New Window
     open_in_current_tab: Open in Current Tab
     open_in_drawer: Open in Drawer
-
     copy_video_link: Copy Video Link
     copy_bv_number: Copy BV Number
     copy_av_number: Copy AV Number
-
     view_the_original_cover: View the Original Cover
-
   group_contribution: '{firstAuthor} and {num} others contributed'
   video_removed: Video removed
-
 home:
   tell_us_why: Choose a reason why
-  not_interested_desc: You can use <kbd>↑</kbd> and <kbd>↓</kbd> to choose the reason, or using number keys to choose the reason directly, press <kbd>Enter</kbd> to confirm.
-
+  not_interested_desc: >-
+    You can use <kbd>↑</kbd> and <kbd>↓</kbd> to choose the reason, or using
+    number keys to choose the reason directly, press <kbd>Enter</kbd> to
+    confirm.
   for_you: For you
   following: Following
   trending: Trending
   ranking: Ranking
   subscribed_series: Subscribed Series
   live: Live
-
 ranking:
   all: All
   chinese_anime_related: Chinese Anime-related
   original_content: Original Content
   debut_work: Debut Work
-
 anime:
   total_episodes: EP {ep}
   update_to_n_episodes: Update to EP {ep}
@@ -469,38 +483,42 @@ anime:
       fri: FRI
       sat: SAT
       sun: SUN
-
 history:
   title: Watch History
   search_watch_history: Search watch history
   clear_all_watch_history: Clear all watch history
-  clear_all_watch_history_confirm: |-
+  clear_all_watch_history_confirm: >-
     Clear all watch history?
-    This operation cannot be reversed. Are you sure you want to clear all watch history?
+
+    This operation cannot be reversed. Are you sure you want to clear all watch
+    history?
   pause_watch_history: Pause watch history
   pause_watch_history_confirm: |-
     Pause watch history?
     Are you sure you want to pause watch history?
   turn_on_watch_history: Turn on watch history
   turn_on_watch_history_confirm: Turn on watch history? Are you sure you want to turn on watch history?
-
 favorites:
   unfavorite: Unfavorite
-  unfavorite_confirm: |-
+  unfavorite_confirm: >-
     Remove selected video(s)?
-    This operation cannot be reversed. Are you sure you want to remove the selected video(s) from your favorites?
 
+    This operation cannot be reversed. Are you sure you want to remove the
+    selected video(s) from your favorites?
 watch_later:
   title: Watch Later
   clear_all: Clear all watch later
-  clear_all_confirm: |-
+  clear_all_confirm: >-
     Clear all watch later?
-    This operation cannot be reversed. Are you sure you want to clear all watch later?
-  remove_watched_videos: Remove watched videos
-  remove_watched_videos_confirm: |-
-    Remove watched videos?
-    This operation cannot be reversed. Are you sure you want to remove watched videos?
 
+    This operation cannot be reversed. Are you sure you want to clear all watch
+    later?
+  remove_watched_videos: Remove watched videos
+  remove_watched_videos_confirm: >-
+    Remove watched videos?
+
+    This operation cannot be reversed. Are you sure you want to remove watched
+    videos?
 search_bar:
   history_title: Search History
   clear_history: Clear search history
