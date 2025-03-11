@@ -1,4 +1,7 @@
 # BewlyCat
+
+![GitHub Release](https://img.shields.io/github/v/release/keleus/BewlyCat)
+
 此项目基于[BewlyBewly](https://github.com/BewlyBewly/BewlyBewly)开发，并在其基础上进行功能扩充和调整，并合并了一些其他拓展的功能。
 
 <p align="center" style="margin-bottom: 0px !important;">
@@ -17,7 +20,7 @@
 > 本项目由MIT许可在原项目基础上开发，并亦与原作者联系取得了授权。
 
 > [!CAUTION]
-> 本插件移除了原插件的`tabs`权限改用了`activeTab`权限，目前我个人使用功能并未受到影响，不确定是否会造成BUG。
+> 本插件移除了原插件的`tabs`权限以及`activeTab`权限，目前我个人使用功能并未受到影响，不确定是否会造成BUG。
 
 ## ⬇️ 安装
 

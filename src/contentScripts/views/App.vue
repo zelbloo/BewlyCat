@@ -402,7 +402,10 @@ provide<BewlyAppProvider>('BEWLY_APP', {
                 w="lg:[calc(100%-200px)] [calc(100%-150px)]"
               >
                 <Transition name="page-fade">
-                  <Component :is="pages[activatedPage]" />
+                  <Component
+                    :is="pages[activatedPage]"
+                    @settings-visibility-change="toggleSettings"
+                  />
                 </Transition>
               </div>
             </main>
