@@ -26,8 +26,10 @@
 
 ### 在线安装
 
+[Chrome应用商店](https://chromewebstore.google.com/detail/oopkfefbgecikmfbbapnlpjidoomhjpl)
+
 > [!TIP]
-> 当前等待Chrome商店审核中，审核通过后会在Chrome商店发布。（目前也是使用有限范围发布）
+> 除遵循MIT协议外，上架市场已经获得原作者授权。
 
 ### 本地安装
 
