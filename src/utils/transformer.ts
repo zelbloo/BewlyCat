@@ -94,7 +94,6 @@ export function createTransformer(trigger: Ref<MaybeElement>, transformer: Trans
       }, {})
 
     for (const key in style.value) {
-      // @ts-expect-error ignore
       s[key] = style.value[key]
     }
 
