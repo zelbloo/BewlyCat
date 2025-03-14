@@ -11,10 +11,8 @@ import emitter from '~/utils/mitt'
 import type { GridLayoutIcon } from './types'
 import { HomeSubPage } from './types'
 
-const emit = defineEmits<{
-  (e: 'settingsVisibilityChange'): void
+const emit = defineEmits(['settings-visibility-change'])
 
-}>()
 const mainStore = useMainStore()
 const { handleBackToTop, scrollbarRef } = useBewlyApp()
 const handleThrottledBackToTop = useThrottleFn((targetScrollTop: number = 0) => handleBackToTop(targetScrollTop), 1000)
@@ -256,7 +254,7 @@ function toggleTabContentLoading(loading: boolean) {
               h-full aspect-square text="$bew-text-2 hover:$bew-text-1"
               rounded-full bg="hover:$bew-fill-2" duration-300
               cursor-pointer
-              @click="emit('settingsVisibilityChange')"
+              @click="emit('settings-visibility-change')"
             >
               <div i-mingcute:settings-3-line text-base />
             </div>

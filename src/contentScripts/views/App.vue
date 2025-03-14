@@ -404,7 +404,12 @@ provide<BewlyAppProvider>('BEWLY_APP', {
                 <Transition name="page-fade">
                   <Component
                     :is="pages[activatedPage]"
+                    v-if="activatedPage === AppPage.Home"
                     @settings-visibility-change="toggleSettings"
+                  />
+                  <Component
+                    :is="pages[activatedPage]"
+                    v-else
                   />
                 </Transition>
               </div>

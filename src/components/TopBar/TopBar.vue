@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onClickOutside, onKeyStroke, useMouseInElement } from '@vueuse/core'
+import { onClickOutside, onKeyStroke, useMouseInElement, useWindowFocus } from '@vueuse/core'
 import type { Ref, UnwrapNestedRefs } from 'vue'
 
 import { useBewlyApp } from '~/composables/useAppProvider'
@@ -292,6 +292,24 @@ watch(
   },
   { immediate: true },
 )
+
+watch(
+  () => drawerVisible.notifications,
+  (newVal, oldVal) => {
+    if (newVal === oldVal)
+      return
+
+    if (!newVal)
+      getUnreadMessageCount()
+  },
+)
+
+const focused = useWindowFocus()
+
+watch (() => focused.value, (newVal) => {
+  if (newVal && isLogin.value)
+    getUnreadMessageCount()
+})
 
 watch(
   () => popupVisible.moments,
