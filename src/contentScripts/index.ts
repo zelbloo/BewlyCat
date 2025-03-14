@@ -12,6 +12,7 @@ import { runWhenIdle } from '~/utils/lazyLoad'
 import { compareVersions, injectCSS, isHomePage, isInIframe, isNotificationPage, isVideoOrBangumiPage } from '~/utils/main'
 import { defaultMode, fullscreen, webFullscreen, widescreen } from '~/utils/player'
 import { SVG_ICONS } from '~/utils/svgIcons'
+import { openLinkInBackground } from '~/utils/tabs'
 
 import { version } from '../../package.json'
 import App from './views/App.vue'
@@ -217,7 +218,36 @@ window.addEventListener('load', () => {
   if (location.pathname.startsWith('/video/')) {
     applyDefaultPlayerMode()
   }
+
+  // 添加搜索页面视频卡片点击事件处理
+  if (/https?:\/\/search\.bilibili\.com\.*/.test(location.href)) {
+    setupBiliVideoCardClickHandler()
+  }
 })
+
+// 添加bili-video-card点击事件处理
+function setupBiliVideoCardClickHandler() {
+  document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement
+    const linkElement = target.closest('.bili-video-card a, .bili-video-card__wrap a')
+
+    if (linkElement instanceof HTMLAnchorElement) {
+      event.preventDefault()
+
+      const href = linkElement.href
+      const videoCardLinkOpenMode = settings.value.videoCardLinkOpenMode
+
+      if (videoCardLinkOpenMode === 'background') {
+        // 后台打开标签页
+        openLinkInBackground(href)
+      }
+      else {
+        // 默认新标签页打开
+        window.open(href, '_blank')
+      }
+    }
+  }, true)
+}
 window.addEventListener('pageshow', () => {
   if (location.pathname.startsWith('/video/')) {
     applyDefaultPlayerMode()

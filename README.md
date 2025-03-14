@@ -17,7 +17,7 @@
 >
 > 不会打包firefox和safari，如果有需要欢迎自行打包。
 >
-> 本项目由MIT许可在原项目基础上开发，并亦与原作者联系取得了授权。
+> 本项目由MIT许可在原项目基础上开发，并亦与原作者联系取得了授权，包括上架Chrome应用商店的权利。
 
 > [!CAUTION]
 > 本插件移除了原插件的`tabs`权限以及`activeTab`权限，目前我个人使用功能并未受到影响，不确定是否会造成BUG。
@@ -27,9 +27,6 @@
 ### 在线安装
 
 [Chrome应用商店](https://chromewebstore.google.com/detail/oopkfefbgecikmfbbapnlpjidoomhjpl)
-
-> [!TIP]
-> 除遵循MIT协议外，上架市场已经获得原作者授权。
 
 ### 本地安装
 
