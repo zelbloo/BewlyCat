@@ -48,44 +48,81 @@ const storageBoth: StorageLikeAsync = {
   },
 
   async setItem<T>(key: string, value: T) {
-    // 修改这里：在设置前检查云端是否已有配置
-    if (key === 'settings') {
-      const syncValueStr = await storageSync.getItem(key) as string | null
-      if (syncValueStr) {
+    try {
+      // 检查值是否已经是字符串
+      const valueStr = typeof value === 'string' ? value : JSON.stringify(value)
+
+      // 始终保存到本地存储
+      await storageLocal.setItem(key, valueStr)
+
+      // 对于settings类型，需要特殊处理同步逻辑
+      if (key === 'settings') {
         try {
-          const syncValue = JSON.parse(syncValueStr) as Settings
-          // 如果云端已有配置且开启了同步，则不覆盖云端配置
-          if (syncValue && syncValue.enableSettingsSync) {
-            // 将云端配置同步到本地
-            await storageLocal.setItem(key, syncValueStr)
-            return Promise.resolve()
+          const parsedValue = JSON.parse(valueStr) as Settings
+          // 如果开启了同步，则同步到云端
+          if (parsedValue.enableSettingsSync) {
+            await storageSync.setItem(key, valueStr)
+          }
+        }
+        catch (e) {
+          console.error('解析设置对象失败:', e)
+        }
+      }
+    }
+    catch (e) {
+      console.error('保存数据失败:', e)
+    }
+    return Promise.resolve()
+  },
+
+  async getItem(key: string): Promise<any | null> {
+    if (key === 'settings') {
+      // 先检查云端是否有配置
+      const syncValue = await storageSync.getItem(key)
+      // 检查本地是否有配置
+      const localValue = await storageLocal.getItem(key)
+
+      if (syncValue) {
+        try {
+          const syncSettings = JSON.parse(syncValue as string) as Settings
+
+          // 如果云端配置开启了同步
+          if (syncSettings.enableSettingsSync) {
+            // 如果本地没有配置或者是默认配置，则使用云端配置
+            if (localValue) {
+              // 将云端配置同步到本地
+              await storageLocal.setItem(key, syncValue)
+              return syncValue
+            }
+
+            try {
+              // 如果本地有配置，检查是否为默认配置
+              const localSettings = JSON.parse(localValue as string) as Settings
+              // 从 storage.ts 导入实际的默认设置值，而不是类型
+              const defaultSettings = (await import('~/logic/storage')).originalSettings
+              const isDefault = JSON.stringify(localSettings) === JSON.stringify(defaultSettings)
+
+              if (isDefault) {
+                // 如果是默认配置，使用云端配置
+                await storageLocal.setItem(key, syncValue)
+                return syncValue
+              }
+            }
+            catch (e) {
+              console.error('解析本地设置失败:', e)
+            }
           }
         }
         catch (e) {
           console.error('解析云端设置失败:', e)
         }
       }
+
+      // 返回本地配置
+      return localValue
     }
 
-    if (value) {
-      const valueJson = JSON.stringify(value)
-      const syncValue = JSON.parse(valueJson) as Settings
-      if (syncValue.enableSettingsSync) {
-        await storageSync.setItem(key, valueJson)
-      }
-      storageLocal.setItem(key, valueJson)
-    }
-    return Promise.resolve()
-  },
-
-  async getItem(key: string): Promise<any | null> {
-    // 优先从同步存储获取数据
-    const syncValue = await storageSync.getItem(key)
-    if (syncValue !== null) {
-      // 确保本地存储也有最新数据
-      await storageLocal.setItem(key, syncValue)
-      return syncValue
-    }
+    // 非settings类型的数据，直接从本地获取
     return storageLocal.getItem(key)
   },
 }
@@ -105,10 +142,8 @@ export function useStorageLocal<T>(
       if (syncSettingsStr) {
         try {
           const syncSettings = JSON.parse(syncSettingsStr) as Settings
-          // 如果云端有配置且开启了同步，则使用云端配置并同步到本地
+          // 如果云端有配置且开启了同步
           if (syncSettings && syncSettings.enableSettingsSync) {
-            // 将云端配置同步到本地
-            await storageLocal.setItem('settings', syncSettingsStr)
             return storageBoth
           }
         }
@@ -117,14 +152,18 @@ export function useStorageLocal<T>(
         }
       }
 
-      // 否则检查本地配置
+      // 检查本地配置
       const result = await storage.local.get('settings')
       const settingsStr = result.settings as string | undefined
 
       if (settingsStr) {
         try {
-          const settings = JSON.parse(settingsStr)
-          return settings?.enableSettingsSync ? storageBoth : storageLocal
+          const settings = JSON.parse(settingsStr) as Settings
+          // 如果本地配置开启了同步
+          if (settings && settings.enableSettingsSync) {
+            return storageBoth
+          }
+          return storageLocal
         }
         catch (e) {
           console.error('解析本地设置失败:', e)

@@ -22,7 +22,7 @@ const _videoClassTag = {
   video: '#bilibiliPlayer video,#bilibili-player video,.bilibili-player video,.player-container video,#bilibiliPlayer bwp-video,#bilibili-player bwp-video,.bilibili-player bwp-video,.player-container bwp-video,#bofqi video,[aria-label="哔哩哔哩播放器"] video',
   player: '#bilibili-player,.bpx-player-container',
   autoPlaySwitchOn: '.auto-play .switch-btn.on',
-  autoPlaySwitchOff: '.auto-play .switch-btn',
+  autoPlaySwitchOff: '.auto-play .switch-btn:not(.on)',
 }
 
 // 重试任务类，用于处理重试逻辑
@@ -155,6 +155,4 @@ export function disableAutoPlayCollection(settings: { disableAutoPlayCollection:
     }
     return false
   }).start()
-
-  return true
 }
