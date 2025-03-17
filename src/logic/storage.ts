@@ -116,6 +116,8 @@ export interface Settings {
 
   // 新增视频播放器默认样式设置
   defaultVideoPlayerMode: 'default' | 'fullscreen' | 'webFullscreen' | 'widescreen'
+  disableAutoPlayCollection: boolean
+
 }
 
 export const originalSettings: Settings = {
@@ -225,6 +227,7 @@ export const originalSettings: Settings = {
 
   // 新增默认值
   defaultVideoPlayerMode: 'default',
+  disableAutoPlayCollection: false,
 }
 
 export const settings = useStorageLocal('settings', ref<Settings>(originalSettings), { mergeDefaults: true })

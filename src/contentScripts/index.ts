@@ -10,7 +10,7 @@ import { setupApp } from '~/logic/common-setup'
 import RESET_BEWLY_CSS from '~/styles/reset.css?raw'
 import { runWhenIdle } from '~/utils/lazyLoad'
 import { compareVersions, injectCSS, isHomePage, isInIframe, isNotificationPage, isVideoOrBangumiPage } from '~/utils/main'
-import { defaultMode, fullscreen, webFullscreen, widescreen } from '~/utils/player'
+import { defaultMode, disableAutoPlayCollection, fullscreen, webFullscreen, widescreen } from '~/utils/player'
 import { SVG_ICONS } from '~/utils/svgIcons'
 import { openLinkInBackground } from '~/utils/tabs'
 
@@ -189,6 +189,7 @@ function applyDefaultPlayerMode() {
       widescreen()
       break
   }
+  disableAutoPlayCollection(settings.value)
 }
 
 // 监听URL变化，用于处理SPA页面导航

@@ -21,6 +21,8 @@ const _videoClassTag = {
   videoArea: '.bilibili-player-video-wrap,.bpx-player-video-area',
   video: '#bilibiliPlayer video,#bilibili-player video,.bilibili-player video,.player-container video,#bilibiliPlayer bwp-video,#bilibili-player bwp-video,.bilibili-player bwp-video,.player-container bwp-video,#bofqi video,[aria-label="哔哩哔哩播放器"] video',
   player: '#bilibili-player,.bpx-player-container',
+  autoPlaySwitchOn: '.auto-play .switch-btn.on',
+  autoPlaySwitchOff: '.auto-play .switch-btn',
 }
 
 // 重试任务类，用于处理重试逻辑
@@ -131,5 +133,28 @@ export function widescreen() {
 // 默认模式下也执行滚动
 export function defaultMode() {
   scrollPlayerToOptimalPosition()
+  return true
+}
+
+export function disableAutoPlayCollection(settings: { disableAutoPlayCollection: boolean }) {
+  if (!settings.disableAutoPlayCollection)
+    return false
+
+  new RetryTask(20, 500, () => {
+    const autoPlaySwitch = document.querySelector(_videoClassTag.autoPlaySwitchOn) as HTMLElement
+    if (autoPlaySwitch) {
+      autoPlaySwitch.click()
+      return true
+    }
+    else {
+      // 如果本来就关闭的，则默认成功
+      const switchOff = document.querySelector(_videoClassTag.autoPlaySwitchOff)
+      if (switchOff) {
+        return true
+      }
+    }
+    return false
+  }).start()
+
   return true
 }
