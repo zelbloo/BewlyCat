@@ -189,7 +189,6 @@ function applyDefaultPlayerMode() {
       widescreen()
       break
   }
-  disableAutoPlayCollection(settings.value)
 }
 
 // 监听URL变化，用于处理SPA页面导航
@@ -218,6 +217,7 @@ function handleVisibilityChange() {
 window.addEventListener('load', () => {
   if (location.pathname.startsWith('/video/')) {
     applyDefaultPlayerMode()
+    disableAutoPlayCollection(settings.value)
   }
 
   // 添加搜索页面视频卡片点击事件处理
