@@ -140,19 +140,9 @@ export function disableAutoPlayCollection(settings: { disableAutoPlayCollection:
   if (!settings.disableAutoPlayCollection)
     return false
 
-  new RetryTask(20, 500, () => {
+  setTimeout(() => {
     const autoPlaySwitch = document.querySelector(_videoClassTag.autoPlaySwitchOn) as HTMLElement
-    if (autoPlaySwitch) {
+    if (autoPlaySwitch)
       autoPlaySwitch.click()
-      return true
-    }
-    else {
-      // 如果本来就关闭的，则默认成功
-      const switchOff = document.querySelector(_videoClassTag.autoPlaySwitchOff)
-      if (switchOff) {
-        return true
-      }
-    }
-    return false
-  }).start()
+  }, 2000)
 }
