@@ -28,6 +28,8 @@
 
 [Chrome应用商店](https://chromewebstore.google.com/detail/oopkfefbgecikmfbbapnlpjidoomhjpl)
 
+[Edge应用商店](https://microsoftedge.microsoft.com/addons/detail/bewlycat/aaammfjdfifgnfnbflolojihjfhdploj)(不知道为啥审核的比Chrome快?)
+
 ### 本地安装
 
 [CI](https://github.com/keleus/BewlyCat/actions)：使用最新代码自动构建
