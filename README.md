@@ -24,7 +24,7 @@
 
 ## ⬇️ 安装
 
-### 在线安装
+### 在线安装(审核可能存在延迟)
 
 [Chrome应用商店](https://chromewebstore.google.com/detail/oopkfefbgecikmfbbapnlpjidoomhjpl)
 
@@ -36,7 +36,7 @@
 
 [Releases](https://github.com/keleus/BewlyCat/releases)：稳定版
 
-#### Edge 和 Chrome（推荐）
+#### Edge 和 Chrome(推荐)
 
 > 确保您下载了 [extension.zip](https://github.com/keleus/BewlyCat/releases)。
 

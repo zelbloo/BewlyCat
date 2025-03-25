@@ -169,6 +169,16 @@ window.addEventListener(BEWLY_MOUNTED, () => {
   }
 })
 
+// 判断是否为视频页面
+function isVideoPage() {
+  return location.pathname.startsWith('/video/')
+}
+
+// 判断是否为番剧页面
+function isBangumiPage() {
+  return location.pathname.startsWith('/bangumi/play/')
+}
+
 // 应用默认播放器模式
 function applyDefaultPlayerMode() {
   const playerMode = settings.value.defaultVideoPlayerMode
@@ -196,8 +206,8 @@ let lastUrl = location.href
 function checkForUrlChanges() {
   if (location.href !== lastUrl) {
     lastUrl = location.href
-    if (location.pathname.startsWith('/video/')) {
-      // 当URL变化且是视频页面时，应用默认播放器模式
+    if (isVideoPage() || isBangumiPage()) {
+      // 当URL变化且是视频或番剧页面时，应用默认播放器模式
       applyDefaultPlayerMode()
     }
   }
@@ -207,17 +217,21 @@ requestAnimationFrame(checkForUrlChanges)
 
 // 处理页面可见性变化
 function handleVisibilityChange() {
-  // 当页面变为可见且是视频页面时
-  if (document.visibilityState === 'visible' && location.pathname.startsWith('/video/')) {
+  // 当页面变为可见且是视频或番剧页面时
+  if (document.visibilityState === 'visible' && (isVideoPage() || isBangumiPage())) {
     applyDefaultPlayerMode()
   }
 }
 
 // 添加页面加载和可见性变化的监听
 window.addEventListener('load', () => {
-  if (location.pathname.startsWith('/video/')) {
+  if (isVideoPage()) {
     applyDefaultPlayerMode()
     disableAutoPlayCollection(settings.value)
+  }
+  else if (isBangumiPage()) {
+    applyDefaultPlayerMode()
+    // 番剧页面不执行 disableAutoPlayCollection
   }
 
   // 添加搜索页面视频卡片点击事件处理
@@ -250,7 +264,7 @@ function setupBiliVideoCardClickHandler() {
   }, true)
 }
 window.addEventListener('pageshow', () => {
-  if (location.pathname.startsWith('/video/')) {
+  if (isVideoPage() || isBangumiPage()) {
     applyDefaultPlayerMode()
   }
 })
