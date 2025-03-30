@@ -12,10 +12,12 @@ export interface UserInfo {
   uname: string // username
   vip: {
     status: number // 1 is vip
+    due_date: number
   }
   wallet: {
     mid: number
     bcoin_balance: number // b幣
+    coupon_balance: number // 每个月可领数量
   }
   is_senior_member: boolean
 }

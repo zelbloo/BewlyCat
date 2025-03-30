@@ -340,6 +340,7 @@ topbar:
     workshop: 我的工房
     my_stream_info: 直播中心
     my_courses: 我的课程
+    bilibili_premium_rewards: 大会员福利领取
     log_out: 退出登录
   noti_dropdown:
     replys: 回复我的

@@ -355,6 +355,7 @@ topbar:
     workshop: 我的工作坊
     my_stream_info: 實況資訊
     my_courses: 我的課程
+    bilibili_premium_rewards: 大會員福利領取
     log_out: 登出
   noti_dropdown:
     replys: 回覆留言

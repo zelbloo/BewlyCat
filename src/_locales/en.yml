@@ -405,6 +405,7 @@ topbar:
     my_stream_info: My stream info
     my_courses: My courses
     log_out: Log out
+    bilibili_premium_rewards: Premium Member Rewards
   noti_dropdown:
     replys: Replys
     mentions: Mentions
