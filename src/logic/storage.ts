@@ -38,7 +38,6 @@ export interface Settings {
   hoverVideoCardDelayed: boolean
 
   // Desktop & Dock
-  useOldTopBar: boolean
   autoHideTopBar: boolean
   showTopBarThemeColorGradient: boolean
   showBewlyOrBiliTopBarSwitcher: boolean
@@ -149,7 +148,6 @@ export const originalSettings: Settings = {
   hoverVideoCardDelayed: false,
 
   // Desktop & Dock
-  useOldTopBar: false,
   autoHideTopBar: false,
   showTopBarThemeColorGradient: true,
   showBewlyOrBiliTopBarSwitcher: true,

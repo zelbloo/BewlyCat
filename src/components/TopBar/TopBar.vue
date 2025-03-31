@@ -400,6 +400,12 @@ async function getUserInfo() {
     if (res.code === 0) {
       isLogin.value = true
       Object.assign(userInfo, res.data)
+      // if (res.data.vip?.status === 1) {
+      //   const vipRes = await api.user.getPrivilegeInfo()
+      //   if (vipRes.code === 0) {
+
+      //   }
+      // }
     }
     // Account not logged in
     else if (res.code === -101) {
