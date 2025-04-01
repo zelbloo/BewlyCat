@@ -101,3 +101,23 @@ export interface FavoriteResource {
   bv_id: string
   bvid: string
 }
+
+export interface PopupVisibleState {
+  channels: boolean
+  userPanel: boolean
+  notifications: boolean
+  moments: boolean
+  favorites: boolean
+  history: boolean
+  watchLater: boolean
+  upload: boolean
+  more: boolean
+}
+
+export interface TopBarItemElements {
+  [key: string]: Ref<HTMLElement | undefined>
+}
+
+export interface TopBarTransformers {
+  [key: string]: Ref<any>
+}

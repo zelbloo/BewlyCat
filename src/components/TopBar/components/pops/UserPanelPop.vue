@@ -9,7 +9,7 @@ import { numFormatter } from '~/utils/dataFormatter'
 import { LV0_ICON, LV1_ICON, LV2_ICON, LV3_ICON, LV4_ICON, LV5_ICON, LV6_ICON, LV6_LIGHTNING_ICON } from '~/utils/lvIcons'
 import { getCSRF, getUserID, isHomePage } from '~/utils/main'
 
-import type { UserInfo, UserStat } from '../types'
+import type { UserInfo, UserStat } from '../../types'
 
 const props = defineProps<{
   userInfo: UserInfo
