@@ -17,6 +17,11 @@ import WatchLaterPop from './pops/WatchLaterPop.vue'
 
 defineProps<{
   forceWhiteIcon?: boolean
+  drawerVisible: { notifications: boolean }
+}>()
+
+const emit = defineEmits<{
+  'notificationsClick': [item: { name: string, url: string, unreadCount: number, icon: string }]
 }>()
 
 const {
@@ -39,7 +44,6 @@ const {
 
 const {
   drawerVisible,
-  handleNotificationsItemClick,
 } = useTopBarNotifications()
 
 const mid = getUserID() || ''
@@ -67,6 +71,11 @@ const {
 onMounted(() => {
   initData()
 })
+
+// 修改通知点击处理
+function handleNotificationsClick(item: { name: string, url: string, unreadCount: number, icon: string }) {
+  emit('notificationsClick', item)
+}
 </script>
 
 <template>
@@ -323,7 +332,7 @@ onMounted(() => {
                 :un-read-message="unReadMessage"
                 :un-read-dm="unReadDm"
                 @click.stop="() => {}"
-                @item-click="handleNotificationsItemClick"
+                @item-click="handleNotificationsClick"
               />
             </Transition>
           </div>

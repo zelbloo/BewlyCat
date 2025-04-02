@@ -31,6 +31,7 @@ const { isOutside: isOutsideTopBar } = useMouseInElement(headerTarget)
 const {
   drawerVisible,
   notificationsDrawerUrl,
+  handleNotificationsItemClick,
 } = useTopBarNotifications()
 
 const {
@@ -149,7 +150,10 @@ defineExpose({
         <TopBarSearch />
 
         <!-- right content -->
-        <TopBarRight />
+        <TopBarRight
+          :drawer-visible="drawerVisible"
+          @notifications-click="handleNotificationsItemClick"
+        />
       </main>
 
       <KeepAlive v-if="settings.openNotificationsPageAsDrawer">
