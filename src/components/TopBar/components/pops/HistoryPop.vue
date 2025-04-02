@@ -249,12 +249,10 @@ function deleteHistoryItem(index: number, historyItem: HistoryItem) {
 
       <!-- historys -->
       <TransitionGroup name="list">
-        <ALink
+        <div
           v-for="(historyItem, index) in historys"
           :key="historyItem.kid"
-          :href="getHistoryUrl(historyItem)"
           class="group"
-          type="topBar"
           m="last:b-4" p="2"
           rounded="$bew-radius"
           hover:bg="$bew-fill-2"
@@ -262,7 +260,9 @@ function deleteHistoryItem(index: number, historyItem: HistoryItem) {
         >
           <section flex="~ gap-4 item-start">
             <!-- Video cover, live cover, ariticle cover -->
-            <div
+            <ALink
+              :href="getHistoryUrl(historyItem)"
+              type="topBar"
               bg="$bew-skeleton"
               pos="relative"
               w="150px"
@@ -377,18 +377,23 @@ function deleteHistoryItem(index: number, historyItem: HistoryItem) {
                   bg="contain"
                 >
               </div>
-            </div>
+            </ALink>
 
             <!-- Description -->
             <div>
-              <h3
-                class="keep-two-lines"
-                overflow="hidden"
-                text="ellipsis"
-                break-anywhere
+              <ALink
+                :href="getHistoryUrl(historyItem)"
+                type="topBar"
               >
-                {{ historyItem.title }}
-              </h3>
+                <h3
+                  class="keep-two-lines"
+                  overflow="hidden"
+                  text="ellipsis"
+                  break-anywhere
+                >
+                  {{ historyItem.title }}
+                </h3>
+              </ALink>
               <div text="$bew-text-2 sm" m="t-4" flex="~" align="items-center">
                 <ALink
                   :href="`https://space.bilibili.com/${historyItem.author_mid}`"
@@ -418,9 +423,8 @@ function deleteHistoryItem(index: number, historyItem: HistoryItem) {
               </p>
             </div>
           </section>
-        </ALink>
+        </div>
       </TransitionGroup>
-
       <!-- loading -->
       <Transition name="fade">
         <Loading v-if="isLoading && historys.length !== 0" m="-t-4" />
