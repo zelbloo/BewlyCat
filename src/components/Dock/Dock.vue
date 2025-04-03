@@ -406,7 +406,7 @@ const dockTransformStyle = computed((): { transform: string, transformOrigin: st
         </template>
         <Transition name="fade">
           <button
-            v-if="showUndoButton"
+            v-if="showUndoButton && settings.enableUndoRefreshButton"
             class="back-to-top-or-refresh-btn"
             :class="{
               inactive: hoveringDockItem.themeMode && isDark,
