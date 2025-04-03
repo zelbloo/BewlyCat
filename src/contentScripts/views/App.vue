@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useEventListener, useThrottleFn, useToggle } from '@vueuse/core'
+import { onKeyStroke, useEventListener, useThrottleFn, useToggle } from '@vueuse/core'
 import type { Ref } from 'vue'
 
 import type { BewlyAppProvider } from '~/composables/useAppProvider'
@@ -163,8 +163,38 @@ onMounted(() => {
   if (isHomePage()) {
     // Force overwrite Bilibili Evolved body tag & html tag background color
     document.body.style.setProperty('background-color', 'unset', 'important')
+
+    // 聚焦到滚动容器的函数
+    const focusScrollContainer = () => {
+      nextTick(() => {
+        if (scrollbarRef.value) {
+          const osInstance = scrollbarRef.value.osInstance()
+          const viewport = osInstance?.elements().viewport
+          if (viewport) {
+            viewport.setAttribute('tabindex', '0')
+            viewport.focus({ preventScroll: true })
+          }
+        }
+      })
+    }
+
+    // Windows/Linux: 监听 Home 键
+    onKeyStroke('Home', (e) => {
+      handleThrottledBackToTop()
+      focusScrollContainer()
+      e.preventDefault()
+    })
+
+    // macOS: 使用原生事件监听 Command+↑ 组合键
+    document.addEventListener('keydown', (e) => {
+      // 确保只有同时按下 Command 和 ArrowUp 键时才触发
+      if (e.key === 'ArrowUp' && e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey) {
+        handleThrottledBackToTop()
+        focusScrollContainer()
+        e.preventDefault()
+      }
+    })
   }
-  // document.documentElement.style.setProperty('font-size', '14px')
 
   document.addEventListener('scroll', () => {
     if (window.scrollY > 0)
@@ -396,7 +426,10 @@ provide<BewlyAppProvider>('BEWLY_APP', {
     >
       <Transition name="fade">
         <template v-if="showBewlyPage">
-          <OverlayScrollbarsComponent ref="scrollbarRef" element="div" h-inherit defer @os-scroll="handleOsScroll">
+          <OverlayScrollbarsComponent
+            ref="scrollbarRef" element="div" h-inherit defer
+            @os-scroll="handleOsScroll"
+          >
             <main m-auto max-w="$bew-page-max-width">
               <div
                 p="t-[calc(var(--bew-top-bar-height)+10px)]" m-auto
