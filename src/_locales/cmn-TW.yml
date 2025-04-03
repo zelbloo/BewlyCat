@@ -33,6 +33,7 @@ common:
     reset: 重設
     import: 匯入
     export: 匯出
+    undo_refresh: 撤銷更新
   table:
     index: 索引
     title: 標題

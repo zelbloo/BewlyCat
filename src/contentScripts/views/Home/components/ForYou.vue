@@ -94,11 +94,16 @@ const needToLoginFirst = ref<boolean>(false)
 const containerRef = ref<HTMLElement>() as Ref<HTMLElement>
 const refreshIdx = ref<number>(1)
 const noMoreContent = ref<boolean>(false)
-const { handleReachBottom, handlePageRefresh, haveScrollbar } = useBewlyApp()
+const { handleReachBottom, handlePageRefresh, haveScrollbar, showUndoButton, handleUndoRefresh } = useBewlyApp()
 const activatedAppVideo = ref<AppVideoItem | null>()
 const videoCardRef = ref(null)
 const showDislikeDialog = ref<boolean>(false)
 const selectedDislikeReason = ref<number>(1)
+
+// 添加缓存数据变量
+const cachedVideoList = ref<VideoElement[]>([])
+const cachedAppVideoList = ref<AppVideoElement[]>([])
+const cachedRefreshIdx = ref<number>(1)
 
 // 添加请求限制相关的变量
 const requestCount = ref<number>(0)
@@ -222,7 +227,32 @@ function initPageAction() {
     if (isLoading.value)
       return
 
+    // 保存当前数据到缓存
+    cachedVideoList.value = JSON.parse(JSON.stringify(videoList.value))
+    cachedAppVideoList.value = JSON.parse(JSON.stringify(appVideoList.value))
+    cachedRefreshIdx.value = refreshIdx.value
+
+    // 显示撤销按钮
+    showUndoButton.value = true
+
     initData()
+  }
+
+  // 添加撤销刷新的处理函数
+  handleUndoRefresh.value = () => {
+    if (cachedVideoList.value.length > 0 || cachedAppVideoList.value.length > 0) {
+      // 恢复缓存的数据
+      videoList.value = cachedVideoList.value
+      appVideoList.value = cachedAppVideoList.value
+      refreshIdx.value = cachedRefreshIdx.value
+
+      // 隐藏撤销按钮
+      showUndoButton.value = false
+
+      // 清空缓存
+      cachedVideoList.value = []
+      cachedAppVideoList.value = []
+    }
   }
 }
 
@@ -401,8 +431,14 @@ function jumpToLoginPage() {
   location.href = 'https://passport.bilibili.com/login'
 }
 
-// 修改 defineExpose，暴露重置方法
-defineExpose({ initData, resetRequestLimit })
+// 修改 defineExpose，暴露重置方法和撤销方法
+defineExpose({
+  initData,
+  resetRequestLimit,
+  undoRefresh: () => {
+    handleUndoRefresh.value?.()
+  },
+})
 </script>
 
 <template>

@@ -19,18 +19,18 @@ const props = defineProps<{
   activatedPage: AppPage
 }>()
 
-// const emit = defineEmits(['pageChange', 'settingsVisibilityChange', 'refresh', 'backToTop'])
 const emit = defineEmits<{
   (e: 'dockItemClick', dockItem: DockItem): void
   (e: 'dockItemMiddleClick', dockItem: DockItem): void
   (e: 'settingsVisibilityChange'): void
   (e: 'refresh'): void
   (e: 'backToTop'): void
+  (e: 'undoRefresh'): void
 }>()
 
 const mainStore = useMainStore()
 const { isDark, toggleDark } = useDark()
-const { reachTop } = useBewlyApp()
+const { reachTop, showUndoButton } = useBewlyApp()
 
 const hideDock = ref<boolean>(false)
 const dockContentHover = ref<boolean>(false)
@@ -170,6 +170,11 @@ function handleBackToTopOrRefresh(action: 'backToTop' | 'refresh' | 'auto' = 'au
     else
       emit('backToTop')
   }
+}
+
+// 处理撤销刷新
+function handleUndoRefresh() {
+  emit('undoRefresh')
 }
 
 function isDockItemActivated(dockItem: DockItem): boolean {
@@ -399,6 +404,21 @@ const dockTransformStyle = computed((): { transform: string, transformOrigin: st
             </Transition>
           </button>
         </template>
+        <Transition name="fade">
+          <button
+            v-if="showUndoButton"
+            class="back-to-top-or-refresh-btn"
+            :class="{
+              inactive: hoveringDockItem.themeMode && isDark,
+            }"
+            @click="handleUndoRefresh"
+          >
+            <Icon
+              icon="mdi:undo-variant"
+              shrink-0 absolute text-2xl
+            />
+          </button>
+        </Transition>
       </div>
     </div>
   </aside>

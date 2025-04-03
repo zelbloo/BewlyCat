@@ -33,6 +33,7 @@ common:
     reset: Reset
     import: Import
     export: Export
+    undo_refresh: Undo Refresh
   table:
     index: Index
     title: Title
