@@ -19,6 +19,40 @@ const emit = defineEmits<{
   (event: 'close'): void
   (event: 'reopen'): void
 }>()
+// 添加滚动相关的变量和方法
+const menuListRef = ref<HTMLElement | null>(null)
+const canScrollUp = ref(false)
+const canScrollDown = ref(false)
+
+// 处理滚动事件，更新箭头显示状态
+function handleScroll() {
+  if (!menuListRef.value)
+    return
+
+  const { scrollTop, scrollHeight, clientHeight } = menuListRef.value
+  canScrollUp.value = scrollTop > 0
+  canScrollDown.value = scrollTop < scrollHeight - clientHeight - 5 // 5px 容差
+}
+
+// 滚动到顶部
+function scrollToTop() {
+  if (!menuListRef.value)
+    return
+  menuListRef.value.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  })
+}
+
+// 滚动到底部
+function scrollToBottom() {
+  if (!menuListRef.value)
+    return
+  menuListRef.value.scrollTo({
+    top: menuListRef.value.scrollHeight,
+    behavior: 'smooth',
+  })
+}
 
 const getVideoType = inject<() => string>('getVideoType')!
 
@@ -78,8 +112,20 @@ const commonOptions = computed((): { command: VideoOption, name: string, icon: s
   return result
 })
 
+// 在菜单显示后检查是否需要显示滚动指示器
+watch(() => showContextMenu.value, (newVal) => {
+  if (newVal) {
+    nextTick(() => {
+      handleScroll()
+    })
+  }
+})
+
 onMounted(() => {
   showContextMenu.value = true
+  nextTick(() => {
+    handleScroll()
+  })
 })
 
 function handleMoreCommand(_command: number) {
@@ -173,9 +219,24 @@ function handleRemoved(selectedOpt?: { dislikeReasonId: number }) {
         p-1 bg="$bew-elevated" rounded="$bew-radius"
         min-w-200px m="t-4 l-[calc(-200px+1rem)]"
         border="1 $bew-border-color"
-        z-10
+        class="context-menu-container"
       >
-        <ul flex="~ col gap-1">
+        <!-- 顶部滚动指示器 -->
+        <div
+          v-show="canScrollUp"
+          class="scroll-indicator scroll-indicator-top"
+          @click="scrollToTop"
+        >
+          <i class="i-mingcute:up-line" />
+        </div>
+
+        <ul
+          ref="menuListRef"
+          flex="~ col gap-1"
+          class="context-menu-list"
+          @scroll="handleScroll"
+        >
+          <!-- 现有内容不变 -->
           <template v-if="getVideoType() === 'appRcmd'">
             <template v-for="option in video.threePointV2" :key="option.type">
               <li
@@ -216,6 +277,15 @@ function handleRemoved(selectedOpt?: { dislikeReasonId: number }) {
             <div v-if="index !== commonOptions.length - 1" class="divider" />
           </template>
         </ul>
+
+        <!-- 底部滚动指示器 -->
+        <div
+          v-show="canScrollDown"
+          class="scroll-indicator scroll-indicator-bottom"
+          @click="scrollToBottom"
+        >
+          <i class="i-mingcute:down-line" />
+        </div>
       </div>
     </div>
 
@@ -223,6 +293,7 @@ function handleRemoved(selectedOpt?: { dislikeReasonId: number }) {
     <div
       v-if="showContextMenu"
       pos="fixed top-0 left-0" w-full h-full
+      style="z-index: 9998;"
       @click="handleClose"
       @click.right.prevent.stop="handleReopen"
     />
@@ -254,5 +325,60 @@ function handleRemoved(selectedOpt?: { dislikeReasonId: number }) {
 
 .divider {
   --uno: "w-full h-1px px-2px bg-$bew-border-color";
+}
+
+.context-menu-container {
+  max-height: 80vh;
+  overflow: hidden;
+  z-index: 9999;
+  position: relative;
+}
+
+.context-menu-list {
+  max-height: calc(80vh - 40px); // 为指示器留出空间
+  overflow-y: auto;
+  padding: 4px 0;
+
+  /* 完全隐藏滚动条 */
+  -ms-overflow-style: none; /* IE 和 Edge */
+  scrollbar-width: none; /* Firefox */
+
+  /* 隐藏 Webkit 浏览器的滚动条 */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.scroll-indicator {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bew-text-color-2);
+  cursor: pointer;
+  background: var(--bew-elevated);
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+
+  &:hover {
+    color: var(--bew-text-color-1);
+    background: var(--bew-fill-2);
+  }
+
+  &-top {
+    top: 0;
+    border-top-left-radius: var(--bew-radius);
+    border-top-right-radius: var(--bew-radius);
+    box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  &-bottom {
+    bottom: 0;
+    border-bottom-left-radius: var(--bew-radius);
+    border-bottom-right-radius: var(--bew-radius);
+    box-shadow: 0 -4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
 }
 </style>
