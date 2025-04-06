@@ -12,10 +12,12 @@ export interface UserInfo {
   uname: string // username
   vip: {
     status: number // 1 is vip
+    due_date: number
   }
   wallet: {
     mid: number
     bcoin_balance: number // b幣
+    coupon_balance: number // 每个月可领数量
   }
   is_senior_member: boolean
 }
@@ -98,4 +100,24 @@ export interface FavoriteResource {
   fav_time: number // 收藏时间
   bv_id: string
   bvid: string
+}
+
+export interface PopupVisibleState {
+  channels: boolean
+  userPanel: boolean
+  notifications: boolean
+  moments: boolean
+  favorites: boolean
+  history: boolean
+  watchLater: boolean
+  upload: boolean
+  more: boolean
+}
+
+export interface TopBarItemElements {
+  [key: string]: Ref<HTMLElement | undefined>
+}
+
+export interface TopBarTransformers {
+  [key: string]: Ref<any>
 }

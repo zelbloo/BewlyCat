@@ -7,7 +7,7 @@ import api from '~/utils/api'
 import { calcCurrentTime } from '~/utils/dataFormatter'
 import { getUserID, removeHttpFromUrl, scrollToTop } from '~/utils/main'
 
-import type { FavoriteCategory, FavoriteResource } from '../types'
+import type { FavoriteCategory, FavoriteResource } from '../../types'
 
 const favoriteCategories = reactive<Array<FavoriteCategory>>([])
 const favoriteResources = reactive<Array<FavoriteResource>>([])

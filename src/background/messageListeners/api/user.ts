@@ -31,6 +31,13 @@ const API_USER = {
     },
     afterHandle: AHS.J_D,
   },
+  getPrivilegeInfo: {
+    url: 'https://api.bilibili.com/x/vip/privilege/my',
+    _fetch: {
+      method: 'get',
+    },
+    afterHandle: AHS.J_D,
+  },
 } satisfies APIMAP
 
 export default API_USER

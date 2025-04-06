@@ -213,6 +213,12 @@ watch(() => settings.value.language, (newValue) => {
       <SettingsItem :title="$t('settings.video_default_player_mode')">
         <Select v-model="settings.defaultVideoPlayerMode" :options="videoPlayerModeOptions" w="full" />
       </SettingsItem>
+      <SettingsItem
+        :title="t('settings.disable_auto_play_collection')"
+        :desc="t('settings.disable_auto_play_collection_desc')"
+      >
+        <Radio v-model="settings.disableAutoPlayCollection" />
+      </SettingsItem>
     </SettingsItemGroup>
 
     <SettingsItemGroup :title="$t('settings.group_video_card')">

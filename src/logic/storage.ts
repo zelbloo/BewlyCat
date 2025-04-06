@@ -38,7 +38,6 @@ export interface Settings {
   hoverVideoCardDelayed: boolean
 
   // Desktop & Dock
-  useOldTopBar: boolean
   autoHideTopBar: boolean
   showTopBarThemeColorGradient: boolean
   showBewlyOrBiliTopBarSwitcher: boolean
@@ -56,6 +55,7 @@ export interface Settings {
   disableDockGlowingEffect: boolean
   disableLightDarkModeSwitcherOnDock: boolean
   backToTopAndRefreshButtonsAreSeparated: boolean
+  enableUndoRefreshButton: boolean // 添加撤销刷新按钮配置项
 
   sidebarPosition: 'left' | 'right'
   autoHideSidebar: boolean
@@ -116,6 +116,8 @@ export interface Settings {
 
   // 新增视频播放器默认样式设置
   defaultVideoPlayerMode: 'default' | 'fullscreen' | 'webFullscreen' | 'widescreen'
+  disableAutoPlayCollection: boolean
+
 }
 
 export const originalSettings: Settings = {
@@ -147,7 +149,6 @@ export const originalSettings: Settings = {
   hoverVideoCardDelayed: false,
 
   // Desktop & Dock
-  useOldTopBar: false,
   autoHideTopBar: false,
   showTopBarThemeColorGradient: true,
   showBewlyOrBiliTopBarSwitcher: true,
@@ -165,6 +166,7 @@ export const originalSettings: Settings = {
   disableDockGlowingEffect: false,
   disableLightDarkModeSwitcherOnDock: false,
   backToTopAndRefreshButtonsAreSeparated: true,
+  enableUndoRefreshButton: false, // 默认关闭撤销刷新按钮
 
   sidebarPosition: 'right',
   autoHideSidebar: false,
@@ -225,6 +227,7 @@ export const originalSettings: Settings = {
 
   // 新增默认值
   defaultVideoPlayerMode: 'default',
+  disableAutoPlayCollection: false,
 }
 
 export const settings = useStorageLocal('settings', ref<Settings>(originalSettings), { mergeDefaults: true })

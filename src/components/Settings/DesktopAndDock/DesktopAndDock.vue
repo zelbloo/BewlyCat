@@ -102,9 +102,6 @@ function handleToggleDockItem(dockItem: any) {
 <template>
   <div>
     <SettingsItemGroup :title="$t('settings.group_topbar')">
-      <SettingsItem :title="$t('settings.use_old_top_bar')">
-        <Radio v-model="settings.useOldTopBar" />
-      </SettingsItem>
       <SettingsItem :title="$t('settings.auto_hide_top_bar')">
         <Radio v-model="settings.autoHideTopBar" />
       </SettingsItem>
@@ -202,6 +199,9 @@ function handleToggleDockItem(dockItem: any) {
       </SettingsItem>
       <SettingsItem :title="$t('settings.back_to_top_and_refresh_buttons_are_separated')">
         <Radio v-model="settings.backToTopAndRefreshButtonsAreSeparated" />
+      </SettingsItem>
+      <SettingsItem :title="$t('settings.enable_undo_refresh_button')" :desc="$t('settings.enable_undo_refresh_button_desc')">
+        <Radio v-model="settings.enableUndoRefreshButton" />
       </SettingsItem>
     </SettingsItemGroup>
     <SettingsItemGroup :title="$t('settings.group_sidebar')" :desc="$t('settings.group_sidebar_desc')">

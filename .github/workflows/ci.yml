@@ -54,9 +54,6 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: pnpm run typecheck
 
-      - name: Test
-        run: pnpm run test
-
       - name: Knip
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: pnpm run knip

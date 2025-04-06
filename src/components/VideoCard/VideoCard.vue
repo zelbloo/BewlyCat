@@ -181,20 +181,28 @@ function handleMoreBtnClick(event: MouseEvent) {
   // the distance between the bottom and the height of the more button
   if (!moreBtnRef.value)
     return
-  const { bottom, height } = moreBtnRef.value.getBoundingClientRect()
+  const { height } = moreBtnRef.value.getBoundingClientRect()
 
   /**
-   * if (screen height - bottom > 406px) then context-menu offset upwards
-   * Why 406? Because the current context-menu is not a responsive layout, it can be temporarily referred to as 406
+   * 计算菜单位置，确保在视口内可见
+   * 如果底部空间不足，则向上偏移，但不超出顶部
    */
-  const offsetTop = window.innerHeight - bottom > 406 ? 0 : -406 - height
+  const menuHeight = Math.min(406, window.innerHeight * 0.8) // 菜单最大高度为视口的80%或406px
+  const topSpace = event.y
+  const bottomSpace = window.innerHeight - event.y
+
+  // 如果底部空间足够，则向下展开；否则向上展开
+  const offsetTop = bottomSpace > menuHeight ? 0 : -menuHeight - height
+
+  // 确保不会超出顶部
+  const finalOffsetTop = Math.max(offsetTop, -topSpace + 10)
 
   showVideoOptions.value = false
   videoOptionsFloatingStyles.value = {
     position: 'absolute',
     top: 0,
     left: 0,
-    transform: `translate(${event.x}px, ${event.y + offsetTop}px)`,
+    transform: `translate(${event.x}px, ${event.y + finalOffsetTop}px)`,
   }
   showVideoOptions.value = true
 }

@@ -17,17 +17,18 @@
 >
 > 不会打包firefox和safari，如果有需要欢迎自行打包。
 >
-> 本项目由MIT许可在原项目基础上开发，并亦与原作者联系取得了授权。
+> 本项目由MIT许可在原项目基础上开发，并亦与原作者联系取得了授权，包括上架Chrome应用商店的权利。
 
 > [!CAUTION]
 > 本插件移除了原插件的`tabs`权限以及`activeTab`权限，目前我个人使用功能并未受到影响，不确定是否会造成BUG。
 
 ## ⬇️ 安装
 
-### 在线安装
+### 在线安装(审核可能存在延迟)
 
-> [!TIP]
-> 当前等待Chrome商店审核中，审核通过后会在Chrome商店发布。（目前也是使用有限范围发布）
+[Chrome应用商店](https://chromewebstore.google.com/detail/oopkfefbgecikmfbbapnlpjidoomhjpl)
+
+[Edge应用商店](https://microsoftedge.microsoft.com/addons/detail/bewlycat/aaammfjdfifgnfnbflolojihjfhdploj)(不知道为啥审核的比Chrome快?)
 
 ### 本地安装
 
@@ -35,7 +36,7 @@
 
 [Releases](https://github.com/keleus/BewlyCat/releases)：稳定版
 
-#### Edge 和 Chrome（推荐）
+#### Edge 和 Chrome(推荐)
 
 > 确保您下载了 [extension.zip](https://github.com/keleus/BewlyCat/releases)。
 
