@@ -193,83 +193,30 @@ export const useTopBarStore = defineStore('topBar', () => {
   }
 
   // Moments Methods
-  // async function getTopBarNewMomentsCount() {
-  //   if (!isLogin.value)
-  //     return
-
-  //   try {
-  //     const res = await api.moment.getTopBarNewMomentsCount()
-  //     if (res.code === 0 && typeof res.data.update_info.item.count === 'number')
-  //       newMomentsCount.value = res.data.update_info.item.count
-  //   }
-  //   catch (error) {
-  //     console.error(error)
-  //   }
-  // }
-
-  async function getTopBarNewMomentsCount() {
-    if (!isLogin.value)
+  async function getTopBarNewMomentsCount(selectedType: string = 'video') {
+    if (!isLogin.value || isLoadingMoments.value)
       return
 
     try {
-      // 避免重复加载，如果已经在加载中则跳过
-      if (isLoadingMoments.value)
-        return
+      isLoadingMoments.value = true
 
       const res = await api.moment.getTopBarMoments({
-        type: 'video', // 默认获取视频更新
+        type: selectedType,
         update_baseline: momentUpdateBaseline.value || undefined,
       })
 
-      if (res.code === 0 && typeof res.data.update_num === 'number')
-        newMomentsCount.value = res.data.update_num
-    }
-    catch (error) {
-      console.error(error)
-    }
-  }
+      if (res.code === 0) {
+        const { update_num, update_baseline, items, has_more } = res.data
 
-  function initMomentsData(selectedType: string) {
-    moments.length = 0
-    momentUpdateBaseline.value = ''
-    momentOffset.value = ''
-    newMomentsCount.value = 0
-    livePage.value = 1
-    noMoreMomentsContent.value = false
+        // 更新计数
+        newMomentsCount.value = update_num
 
-    getMomentsData(selectedType)
-  }
+        // 如果有更新内容且不是在弹窗中，则更新基准线
+        if (update_baseline && !popupVisible.moments)
+          momentUpdateBaseline.value = update_baseline
 
-  function getMomentsData(selectedType: string) {
-    if (selectedType !== 'live')
-      getTopBarMoments(selectedType)
-    else
-      getTopBarLiveMoments()
-  }
-
-  function checkIfHasNewMomentsThenUpdateMoments(selectedType: string) {
-    if (selectedType === 'live')
-      return
-
-    if (isLoadingMoments.value)
-      return
-
-    isLoadingMoments.value = true
-    api.moment.getTopBarMoments({
-      type: selectedType,
-      update_baseline: momentUpdateBaseline.value || undefined,
-    })
-      .then((res: any) => {
-        if (res.code === 0) {
-          const { has_more, items, update_baseline, update_num } = res.data
-
-          if (!has_more) {
-            noMoreMomentsContent.value = true
-            return
-          }
-          if (update_num === 0)
-            return
-
+        // 如果弹窗打开且有新内容，则添加到列表顶部
+        if (popupVisible.moments && update_num > 0 && items?.length) {
           for (let i = update_num - 1; i >= 0; i--) {
             moments.unshift({
               type: selectedType,
@@ -283,18 +230,45 @@ export const useTopBarStore = defineStore('topBar', () => {
               rid: items[i].rid,
             })
           }
-
-          newMomentsCount.value = update_num
-          momentUpdateBaseline.value = update_baseline
         }
-      })
-      .finally(() => isLoadingMoments.value = false)
+
+        // 更新是否有更多内容的标志
+        if (has_more === false)
+          noMoreMomentsContent.value = true
+      }
+    }
+    catch (error) {
+      console.error(error)
+    }
+    finally {
+      isLoadingMoments.value = false
+    }
   }
 
+  function initMomentsData(selectedType: string) {
+    // 重置所有相关状态
+    moments.length = 0
+    momentUpdateBaseline.value = ''
+    momentOffset.value = ''
+    newMomentsCount.value = 0
+    livePage.value = 1
+    noMoreMomentsContent.value = false
+
+    // 获取初始数据
+    getMomentsData(selectedType)
+  }
+
+  function getMomentsData(selectedType: string) {
+    if (selectedType !== 'live')
+      getTopBarMoments(selectedType)
+    else
+      getTopBarLiveMoments()
+  }
+
+  // 移除 checkIfHasNewMomentsThenUpdateMoments 函数，合并到 getTopBarNewMomentsCount
+
   function getTopBarMoments(selectedType: string) {
-    if (isLoadingMoments.value)
-      return
-    if (noMoreMomentsContent.value)
+    if (isLoadingMoments.value || noMoreMomentsContent.value)
       return
 
     isLoadingMoments.value = true
@@ -312,26 +286,30 @@ export const useTopBarStore = defineStore('topBar', () => {
             return
           }
 
+          // 更新状态
           newMomentsCount.value = update_num
           momentUpdateBaseline.value = update_baseline
           momentOffset.value = offset
 
-          moments.push(
-            ...items.map((item: any) => ({
-              type: selectedType,
-              title: item.title,
-              author: item.author.name,
-              authorFace: item.author.face,
-              authorJumpUrl: item.author.jump_url,
-              pubTime: item.pub_time,
-              cover: item.cover,
-              link: item.jump_url,
-              rid: item.rid,
-            }),
-            ),
-          )
+          // 添加新内容
+          if (items?.length) {
+            moments.push(
+              ...items.map((item: any) => ({
+                type: selectedType,
+                title: item.title,
+                author: item.author.name,
+                authorFace: item.author.face,
+                authorJumpUrl: item.author.jump_url,
+                pubTime: item.pub_time,
+                cover: item.cover,
+                link: item.jump_url,
+                rid: item.rid,
+              })),
+            )
+          }
         }
       })
+      .catch(error => console.error(error))
       .finally(() => isLoadingMoments.value = false)
   }
 
@@ -407,7 +385,6 @@ export const useTopBarStore = defineStore('topBar', () => {
     }
   }
 
-  // Notification Drawer Methods
   function handleNotificationsItemClick(item: { name: string, url: string, unreadCount: number, icon: string }) {
     if (settings.value.openNotificationsPageAsDrawer) {
       drawerVisible.notifications = true
@@ -415,7 +392,6 @@ export const useTopBarStore = defineStore('topBar', () => {
     }
   }
 
-  // Popup Methods
   function closeAllPopups(exceptionKey?: string) {
     Object.keys(popupVisible).forEach((key) => {
       if (key !== exceptionKey)
@@ -423,7 +399,6 @@ export const useTopBarStore = defineStore('topBar', () => {
     })
   }
 
-  // 从 setupTopBarWatchers 整合的方法
   function setupWatchers(toggleTopBarVisible: (visible: boolean) => void, favoritesTransformer: Ref<any>) {
     // 自动隐藏顶栏设置监听
     watch(() => settings.value.autoHideTopBar, (newVal) => {
@@ -470,9 +445,18 @@ export const useTopBarStore = defineStore('topBar', () => {
         if (newVal === oldVal)
           return
 
-        // 只在弹窗关闭时更新计数，避免重复调用
-        if (!newVal && isLogin.value)
-          await getTopBarNewMomentsCount()
+        // 只在弹窗打开或关闭时更新
+        if (isLogin.value) {
+          if (newVal) {
+            // 弹窗打开时，如果没有内容则初始化
+            if (moments.length === 0)
+              await getTopBarMoments('video')
+          }
+          else {
+            // 弹窗关闭时更新计数
+            await getTopBarNewMomentsCount('video')
+          }
+        }
       },
       { immediate: true },
     )
@@ -596,7 +580,6 @@ export const useTopBarStore = defineStore('topBar', () => {
     // 添加新的方法导出
     initMomentsData,
     getMomentsData,
-    checkIfHasNewMomentsThenUpdateMoments,
     isNewMoment,
     toggleWatchLater,
   }
