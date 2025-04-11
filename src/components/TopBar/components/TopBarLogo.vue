@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { settings } from '~/logic'
-// import { useTopBarCore } from '../composables/useTopBarCore'
 import { useTopBarStore } from '~/stores/topBarStore'
 
 import { useTopBarInteraction } from '../composables/useTopBarInteraction'
