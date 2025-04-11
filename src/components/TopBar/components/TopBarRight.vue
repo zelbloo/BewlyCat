@@ -30,14 +30,13 @@ const {
   userInfo,
   unReadMessage,
   unReadDm,
-  newMomentsCount: storeNewMomentsCount,
+  newMomentsCount,
   drawerVisible,
   popupVisible,
   avatarImg,
   avatarShadow,
-} = topBarStore
+} = toRefs(topBarStore)
 
-// 将计数属性移到组件中
 const unReadMessageCount = computed((): number => {
   let result = 0
 
@@ -50,16 +49,16 @@ const unReadMessageCount = computed((): number => {
   })
 
   // 计算 unReadDm 中的未读消息
-  if (typeof unReadDm.follow_unread === 'number')
-    result += unReadDm.follow_unread
-  if (typeof unReadDm.unfollow_unread === 'number')
-    result += unReadDm.unfollow_unread
+  if (typeof unReadDm.value.follow_unread === 'number')
+    result += unReadDm.value.follow_unread
+  if (typeof unReadDm.value.unfollow_unread === 'number')
+    result += unReadDm.value.unfollow_unread
 
   return result
 })
 
-// 使用 store 中的 newMomentsCount 作为数据源
-const newMomentsCount = computed(() => storeNewMomentsCount)
+// // 使用 store 中的 newMomentsCount 作为数据源
+// const newMomentsCount = computed(() => storeNewMomentsCount)
 
 const { handleClickTopBarItem, setupTopBarItems } = useTopBarInteraction()
 

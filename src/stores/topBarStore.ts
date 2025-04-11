@@ -22,7 +22,7 @@ import { useBewlyApp } from '~/composables/useAppProvider'
 import { AppPage } from '~/enums/appEnums'
 import { settings } from '~/logic'
 import api from '~/utils/api'
-import { isHomePage, isInIframe } from '~/utils/main'
+import { getCSRF, isHomePage, isInIframe } from '~/utils/main'
 
 export const useTopBarStore = defineStore('topBar', () => {
   const isLogin = ref<boolean>(true)
@@ -38,6 +38,14 @@ export const useTopBarStore = defineStore('topBar', () => {
 
   // Moments State
   const newMomentsCount = ref<number>(0)
+  // 添加 Moments 相关状态
+  const moments = reactive<any[]>([])
+  const addedWatchLaterList = reactive<number[]>([])
+  const isLoadingMoments = ref<boolean>(false)
+  const noMoreMomentsContent = ref<boolean>(false)
+  const livePage = ref<number>(1)
+  const momentUpdateBaseline = ref<string>('')
+  const momentOffset = ref<string>('')
 
   // UI State
   const drawerVisible = reactive({
@@ -185,18 +193,217 @@ export const useTopBarStore = defineStore('topBar', () => {
   }
 
   // Moments Methods
+  // async function getTopBarNewMomentsCount() {
+  //   if (!isLogin.value)
+  //     return
+
+  //   try {
+  //     const res = await api.moment.getTopBarNewMomentsCount()
+  //     if (res.code === 0 && typeof res.data.update_info.item.count === 'number')
+  //       newMomentsCount.value = res.data.update_info.item.count
+  //   }
+  //   catch (error) {
+  //     console.error(error)
+  //   }
+  // }
+
   async function getTopBarNewMomentsCount() {
     if (!isLogin.value)
       return
 
     try {
-      // 修正API调用路径
-      const res = await api.moment.getTopBarNewMomentsCount()
-      if (res.code === 0 && typeof res.data.update_info.item.count === 'number')
-        newMomentsCount.value = res.data.update_info.item.count
+      // 避免重复加载，如果已经在加载中则跳过
+      if (isLoadingMoments.value)
+        return
+
+      const res = await api.moment.getTopBarMoments({
+        type: 'video', // 默认获取视频更新
+        update_baseline: momentUpdateBaseline.value || undefined,
+      })
+
+      if (res.code === 0 && typeof res.data.update_num === 'number')
+        newMomentsCount.value = res.data.update_num
     }
     catch (error) {
       console.error(error)
+    }
+  }
+
+  function initMomentsData(selectedType: string) {
+    moments.length = 0
+    momentUpdateBaseline.value = ''
+    momentOffset.value = ''
+    newMomentsCount.value = 0
+    livePage.value = 1
+    noMoreMomentsContent.value = false
+
+    getMomentsData(selectedType)
+  }
+
+  function getMomentsData(selectedType: string) {
+    if (selectedType !== 'live')
+      getTopBarMoments(selectedType)
+    else
+      getTopBarLiveMoments()
+  }
+
+  function checkIfHasNewMomentsThenUpdateMoments(selectedType: string) {
+    if (selectedType === 'live')
+      return
+
+    if (isLoadingMoments.value)
+      return
+
+    isLoadingMoments.value = true
+    api.moment.getTopBarMoments({
+      type: selectedType,
+      update_baseline: momentUpdateBaseline.value || undefined,
+    })
+      .then((res: any) => {
+        if (res.code === 0) {
+          const { has_more, items, update_baseline, update_num } = res.data
+
+          if (!has_more) {
+            noMoreMomentsContent.value = true
+            return
+          }
+          if (update_num === 0)
+            return
+
+          for (let i = update_num - 1; i >= 0; i--) {
+            moments.unshift({
+              type: selectedType,
+              title: items[i].title,
+              author: items[i].author.name,
+              authorFace: items[i].author.face,
+              authorJumpUrl: items[i].author.jump_url,
+              pubTime: items[i].pub_time,
+              cover: items[i].cover,
+              link: items[i].jump_url,
+              rid: items[i].rid,
+            })
+          }
+
+          newMomentsCount.value = update_num
+          momentUpdateBaseline.value = update_baseline
+        }
+      })
+      .finally(() => isLoadingMoments.value = false)
+  }
+
+  function getTopBarMoments(selectedType: string) {
+    if (isLoadingMoments.value)
+      return
+    if (noMoreMomentsContent.value)
+      return
+
+    isLoadingMoments.value = true
+    api.moment.getTopBarMoments({
+      type: selectedType,
+      update_baseline: momentUpdateBaseline.value || undefined,
+      offset: momentOffset.value || undefined,
+    })
+      .then((res: any) => {
+        if (res.code === 0) {
+          const { has_more, items, offset, update_baseline, update_num } = res.data
+
+          if (!has_more) {
+            noMoreMomentsContent.value = true
+            return
+          }
+
+          newMomentsCount.value = update_num
+          momentUpdateBaseline.value = update_baseline
+          momentOffset.value = offset
+
+          moments.push(
+            ...items.map((item: any) => ({
+              type: selectedType,
+              title: item.title,
+              author: item.author.name,
+              authorFace: item.author.face,
+              authorJumpUrl: item.author.jump_url,
+              pubTime: item.pub_time,
+              cover: item.cover,
+              link: item.jump_url,
+              rid: item.rid,
+            }),
+            ),
+          )
+        }
+      })
+      .finally(() => isLoadingMoments.value = false)
+  }
+
+  function getTopBarLiveMoments() {
+    if (isLoadingMoments.value)
+      return
+    if (noMoreMomentsContent.value)
+      return
+
+    isLoadingMoments.value = true
+    const pageSize = 10
+    api.moment.getTopBarLiveMoments({
+      page: livePage.value,
+      pagesize: pageSize,
+    })
+      .then((res: any) => {
+        if (res.code === 0) {
+          const { list } = res.data
+
+          // if the length of this list is less then the pageSize, it means that it have no more contents
+          if (list.length < pageSize) {
+            noMoreMomentsContent.value = true
+          }
+
+          // if the length of this list is equal to the pageSize, this means that it may have the next page.
+          if (list.length === pageSize)
+            livePage.value++
+
+          moments.push(
+            ...list.map((item: any) => ({
+              type: 'live',
+              title: item.title,
+              author: item.uname,
+              authorFace: item.face,
+              cover: item.pic,
+              link: item.link,
+            }),
+            ),
+          )
+        }
+      })
+      .finally(() => isLoadingMoments.value = false)
+  }
+
+  function isNewMoment(index: number) {
+    return index < newMomentsCount.value
+  }
+
+  function toggleWatchLater(aid: number) {
+    const isInWatchLater = addedWatchLaterList.includes(aid)
+
+    if (!isInWatchLater) {
+      api.watchlater.saveToWatchLater({
+        aid,
+        csrf: getCSRF(),
+      })
+        .then((res: any) => {
+          if (res.code === 0)
+            addedWatchLaterList.push(aid)
+        })
+    }
+    else {
+      api.watchlater.removeFromWatchLater({
+        aid,
+        csrf: getCSRF(),
+      })
+        .then((res: any) => {
+          if (res.code === 0) {
+            addedWatchLaterList.length = 0
+            Object.assign(addedWatchLaterList, addedWatchLaterList.filter(item => item !== aid))
+          }
+        })
     }
   }
 
@@ -251,27 +458,25 @@ export const useTopBarStore = defineStore('topBar', () => {
       },
     )
 
-    // 窗口焦点监听
     const focused = useWindowFocus()
     watch(() => focused.value, (newVal) => {
       if (newVal && isLogin.value)
         getUnreadMessageCount()
     })
 
-    // 动态相关监听
     watch(
       () => popupVisible.moments,
       async (newVal, oldVal) => {
         if (newVal === oldVal)
           return
 
-        if (!newVal)
+        // 只在弹窗关闭时更新计数，避免重复调用
+        if (!newVal && isLogin.value)
           await getTopBarNewMomentsCount()
       },
       { immediate: true },
     )
 
-    // 收藏夹相关监听
     watch(() => popupVisible.favorites, (newVal, oldVal) => {
       if (newVal === oldVal)
         return
@@ -284,37 +489,29 @@ export const useTopBarStore = defineStore('topBar', () => {
     })
   }
 
-  // 添加全局定时器引用
   let updateTimer: ReturnType<typeof setInterval> | null = null
 
-  // Init Method
   function initData() {
     getUserInfo()
     getUnreadMessageCount()
     getTopBarNewMomentsCount()
-
-    // 启动定时更新
     startUpdateTimer()
   }
 
-  // 添加单独的定时器管理函数
   function startUpdateTimer() {
-    // 确保不会创建多个定时器
     if (updateTimer) {
       clearInterval(updateTimer)
       updateTimer = null
     }
-
-    // 创建新的定时器
     updateTimer = setInterval(() => {
       if (isLogin.value) {
         getUnreadMessageCount()
-        getTopBarNewMomentsCount()
+        // 只有在弹窗未显示时才更新计数，避免与 watch 重复调用
+        if (!popupVisible.moments)
+          getTopBarNewMomentsCount()
       }
     }, updateInterval)
   }
-
-  // 清理定时器函数
   function stopUpdateTimer() {
     if (updateTimer) {
       clearInterval(updateTimer)
@@ -322,12 +519,9 @@ export const useTopBarStore = defineStore('topBar', () => {
     }
   }
 
-  // 完善清理函数
   function cleanup() {
-    // 清理定时器
     stopUpdateTimer()
 
-    // 重置状态
     Object.keys(unReadMessage).forEach((key) => {
       unReadMessage[key as keyof UnReadMessage] = 0
     })
@@ -336,7 +530,6 @@ export const useTopBarStore = defineStore('topBar', () => {
     })
     newMomentsCount.value = 0
 
-    // 关闭所有弹窗
     closeAllPopups()
     drawerVisible.notifications = false
   }
@@ -390,5 +583,21 @@ export const useTopBarStore = defineStore('topBar', () => {
     setupWatchers,
     startUpdateTimer,
     stopUpdateTimer,
+
+    // 添加新的导出
+    moments,
+    addedWatchLaterList,
+    isLoadingMoments,
+    noMoreMomentsContent,
+    livePage,
+    momentUpdateBaseline,
+    momentOffset,
+
+    // 添加新的方法导出
+    initMomentsData,
+    getMomentsData,
+    checkIfHasNewMomentsThenUpdateMoments,
+    isNewMoment,
+    toggleWatchLater,
   }
 })
