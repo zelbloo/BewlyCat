@@ -44,8 +44,6 @@ const selectedMomentTab = ref<MomentTab>(momentTabs.value[0])
 
 const momentsWrap = ref()
 
-const newMomentsCount = ref<number>(0)
-
 watch(() => selectedMomentTab.value.type, (newVal, oldVal) => {
   if (newVal === oldVal)
     return
@@ -86,14 +84,6 @@ function initData() {
 
 function getData() {
   topBarStore.getMomentsData(selectedMomentTab.value.type)
-}
-
-function checkIfHasNewMomentsThenUpdateMoments() {
-  topBarStore.checkIfHasNewMomentsThenUpdateMoments(selectedMomentTab.value.type)
-}
-
-function isNewMoment(index: number) {
-  return index < newMomentsCount.value
 }
 
 function toggleWatchLater(aid: number) {
@@ -138,9 +128,9 @@ function handleMouseLeave() {
   }, 100)
 }
 
-defineExpose({
-  checkIfHasNewMomentsThenUpdateMoments,
-})
+// defineExpose({
+//   checkIfHasNewMomentsThenUpdateMoments,
+// })
 </script>
 
 <template>
@@ -228,7 +218,7 @@ defineExpose({
         >
           <!-- new moment dot -->
           <div
-            v-if="isNewMoment(index)"
+            v-if="topBarStore.isNewMoment(index)"
             rounded="full"
             w="8px"
             h="8px"
