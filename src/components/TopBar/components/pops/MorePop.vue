@@ -1,7 +1,24 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 
+import { useTopBarStore } from '~/stores/topBarStore'
 import { getUserID } from '~/utils/main'
+
+// 添加鼠标事件处理函数
+function handleMouseEnter() {
+  const topBarStore = useTopBarStore()
+  topBarStore.setMouseOverPopup('more', true)
+}
+
+function handleMouseLeave() {
+  const topBarStore = useTopBarStore()
+  topBarStore.setMouseOverPopup('more', false)
+
+  // 延迟关闭弹窗，避免鼠标快速移动时的闪烁
+  setTimeout(() => {
+    topBarStore.popupVisible.more = false
+  }, 100)
+}
 
 const { t } = useI18n()
 
@@ -26,6 +43,10 @@ const list = computed((): { name: string, url: string, icon: string }[] => [
     flex="~ col"
     shadow="[var(--bew-shadow-edge-glow-1),var(--bew-shadow-3)]"
     border="1 $bew-border-color"
+    class="more-pop bew-popover"
+    data-key="more"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
   >
     <ALink
       v-for="item in list"

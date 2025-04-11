@@ -16,3 +16,4 @@ extension-safari/
 node_modules
 web-ext-profile
 extension-safari-macos/
+# src/old-extension/
