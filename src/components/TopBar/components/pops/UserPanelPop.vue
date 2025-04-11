@@ -290,34 +290,11 @@ function handleClickChannel() {
       mb-2 p-2 bg="$bew-fill-alt" rounded="$bew-radius"
       shadow="[var(--bew-shadow-edge-glow-1),var(--bew-shadow-1)]"
     >
-      <a
+      <ALink
         v-for="item in otherLinks.filter((_, index) => index <= 1)"
         :key="item.url"
         :href="item.url"
-        target="_blank"
-        p="x-4 y-2" flex="~ items-center justify-between"
-        rounded="$bew-radius"
-        duration-300
-        bg="hover:$bew-fill-2"
-      >
-        <div flex="~ items-center gap-2">
-          <div :class="item.icon" text="$bew-text-2" />
-          {{ item.name }}
-        </div>
-        <div i-mingcute:arrow-right-line />
-      </a>
-    </div>
-
-    <div
-      flex="~ justify-between col gap-1"
-      p-2 bg="$bew-fill-alt" rounded="$bew-radius"
-      shadow="[var(--bew-shadow-edge-glow-1),var(--bew-shadow-1)]"
-    >
-      <a
-        v-for="item in otherLinks.filter((_, index) => index > 1)"
-        :key="item.url"
-        :href="item.url"
-        target="_blank"
+        type="topBar"
         p="x-4 y-2" flex="~ items-center justify-between"
         rounded="$bew-radius"
         duration-300
@@ -328,7 +305,30 @@ function handleClickChannel() {
           {{ item.name }}
         </div>
         <div i-mingcute:arrow-right-line />
-      </a>
+      </ALink>
+    </div>
+
+    <div
+      flex="~ justify-between col gap-1"
+      p-2 bg="$bew-fill-alt" rounded="$bew-radius"
+      shadow="[var(--bew-shadow-edge-glow-1),var(--bew-shadow-1)]"
+    >
+      <ALink
+        v-for="item in otherLinks.filter((_, index) => index > 1)"
+        :key="item.url"
+        :href="item.url"
+        type="topBar"
+        p="x-4 y-2" flex="~ items-center justify-between"
+        rounded="$bew-radius"
+        duration-300
+        hover:bg="$bew-fill-2"
+      >
+        <div flex="~ items-center gap-2">
+          <div :class="item.icon" text="$bew-text-2" />
+          {{ item.name }}
+        </div>
+        <div i-mingcute:arrow-right-line />
+      </ALink>
       <div
         text="$bew-error-color"
         p="x-4 y-2" flex="~ items-center"
