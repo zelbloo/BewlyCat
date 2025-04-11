@@ -195,7 +195,6 @@ nextTick(() => {
                   <i i-mingcute:close-line />
                 </template>
                 {{ $t('iframe_drawer.close') }}
-                <kbd>Esc</kbd>
               </Button>
               <Button
                 v-else
