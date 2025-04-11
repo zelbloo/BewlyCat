@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { settings } from '~/logic'
+import { useTopBarStore } from '~/stores/topBarStore'
 
-import { useTopBarReactive } from '../composables/useTopBarReactive'
-
-const { showSearchBar, forceWhiteIcon } = useTopBarReactive()
+const {
+  showSearchBar,
+  forceWhiteIcon,
+} = useTopBarStore()
 </script>
 
 <template>

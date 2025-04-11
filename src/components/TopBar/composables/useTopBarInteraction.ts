@@ -3,46 +3,39 @@ import { reactive, ref } from 'vue'
 
 import { useDelayedHover } from '~/composables/useDelayedHover'
 import { settings } from '~/logic'
+import { useTopBarStore } from '~/stores/topBarStore'
 import { createTransformer } from '~/utils/transformer'
 
-import type { PopupVisibleState, TopBarItemElements, TopBarTransformers } from '../types'
-
 export function useTopBarInteraction() {
-  // Popup States
-  const popupVisible = reactive<PopupVisibleState>({
-    channels: false,
-    userPanel: false,
-    notifications: false,
-    moments: false,
-    favorites: false,
-    history: false,
-    watchLater: false,
-    upload: false,
-    more: false,
-  })
+  const topBarStore = useTopBarStore()
+  const { popupVisible, closeAllPopups } = topBarStore
 
-  const currentClickedTopBarItem = ref<keyof PopupVisibleState | null>(null)
-  const topBarItemElements: TopBarItemElements = {}
-  const topBarTransformers: TopBarTransformers = {}
+  // 顶栏元素引用
+  const topBarItemElements = reactive({})
+  const topBarTransformers = reactive({})
 
-  // Popup Methods
-  function closeAllTopBarPopup(exceptionKey?: keyof PopupVisibleState) {
-    Object.keys(popupVisible).forEach((key) => {
-      if (key !== exceptionKey)
-        popupVisible[key as keyof PopupVisibleState] = false
-    })
-  }
+  // 跟踪鼠标是否在弹窗上
+  const isMouseOverPopup = reactive<Record<string, boolean>>({})
 
-  function setupTopBarItemHoverEvent(key: keyof PopupVisibleState) {
+  // 当前点击的顶栏项
+  const currentClickedTopBarItem = ref<string | null>(null)
+
+  // 设置顶栏项悬停事件
+  function setupTopBarItemHoverEvent(key: string) {
     const element = useDelayedHover({
       enterDelay: 320,
       leaveDelay: 320,
-      beforeEnter: () => closeAllTopBarPopup(key),
+      beforeEnter: () => closeAllPopups(key),
       enter: () => {
         popupVisible[key] = true
       },
       leave: () => {
-        popupVisible[key] = false
+        // 只有当鼠标不在弹窗上时才隐藏
+        setTimeout(() => {
+          if (!isMouseOverPopup[key]) {
+            popupVisible[key] = false
+          }
+        }, 200)
       },
     })
 
@@ -50,7 +43,8 @@ export function useTopBarInteraction() {
     return element
   }
 
-  function setupTopBarItemTransformer(key: keyof PopupVisibleState) {
+  // 设置顶栏项变换器
+  function setupTopBarItemTransformer(key: string) {
     const transformer = createTransformer(topBarItemElements[key], {
       x: '0px',
       y: '50px',
@@ -63,25 +57,50 @@ export function useTopBarInteraction() {
     return transformer
   }
 
-  function handleClickTopBarItem(event: MouseEvent, key: keyof PopupVisibleState) {
+  // 处理顶栏项点击
+  function handleClickTopBarItem(event: MouseEvent, key: string) {
     if (settings.value.touchScreenOptimization) {
       event.preventDefault()
-      closeAllTopBarPopup(key)
+      closeAllPopups(key)
       popupVisible[key] = !popupVisible[key]
       currentClickedTopBarItem.value = key
     }
   }
 
-  function setupClickOutside() {
-    Object.entries(topBarItemElements).forEach(([key, element]) => {
-      onClickOutside(element, () => {
-        if (currentClickedTopBarItem.value === key)
-          popupVisible[key as keyof PopupVisibleState] = false
-      })
-    })
+  // 新增：注册顶栏项元素和变换器
+  // 修改 registerTopBarItem 方法
+  function registerTopBarItem(key: string, element: HTMLElement | null, transformer: any) {
+    if (element) {
+      // 注册元素
+      topBarItemElements[key] = element
+
+      // 设置悬停事件
+      if (!settings.value.touchScreenOptimization) {
+        // 鼠标进入图标时显示弹窗
+        element.addEventListener('mouseenter', () => {
+          closeAllPopups(key)
+          popupVisible[key] = true
+        })
+
+        // 鼠标离开图标时，检查是否进入了弹窗
+        element.addEventListener('mouseleave', () => {
+          // 延迟处理，给用户足够时间移动到弹窗
+          setTimeout(() => {
+            if (!topBarStore.getMouseOverPopup(key)) {
+              popupVisible[key] = false
+            }
+          }, 200)
+        })
+      }
+
+      // 注册变换器
+      if (transformer) {
+        topBarTransformers[key] = transformer
+      }
+    }
   }
 
-  // Setup TopBar Items
+  // 设置顶栏项
   function setupTopBarItems() {
     const channels = setupTopBarItemHoverEvent('channels')
     const avatar = setupTopBarItemHoverEvent('userPanel')
@@ -125,19 +144,20 @@ export function useTopBarInteraction() {
     }
   }
 
+  // 设置点击外部关闭弹窗
+  function setupClickOutside() {
+    onClickOutside(document.body, () => {
+      closeAllPopups()
+      currentClickedTopBarItem.value = null
+    })
+  }
+
   return {
-    // States
     popupVisible,
     currentClickedTopBarItem,
-    topBarItemElements,
-    topBarTransformers,
-
-    // Methods
-    closeAllTopBarPopup,
-    setupTopBarItemHoverEvent,
-    setupTopBarItemTransformer,
     handleClickTopBarItem,
-    setupClickOutside,
     setupTopBarItems,
+    setupClickOutside,
+    registerTopBarItem, // 导出新增的方法
   }
 }

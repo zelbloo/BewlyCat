@@ -7,6 +7,7 @@ import Loading from '~/components/Loading.vue'
 import Tooltip from '~/components/Tooltip.vue'
 import type { TopBarLiveMomentResult } from '~/models/moment/topBarLiveMoment'
 import type { TopBarMomentResult } from '~/models/moment/topBarMoment'
+import { useTopBarStore } from '~/stores/topBarStore'
 import api from '~/utils/api'
 import { getCSRF, scrollToTop } from '~/utils/main'
 
@@ -269,6 +270,22 @@ function toggleWatchLater(aid: number) {
   }
 }
 
+// 添加鼠标事件处理函数
+function handleMouseEnter() {
+  const topBarStore = useTopBarStore()
+  topBarStore.setMouseOverPopup('moments', true)
+}
+
+function handleMouseLeave() {
+  const topBarStore = useTopBarStore()
+  topBarStore.setMouseOverPopup('moments', false)
+
+  // 延迟关闭弹窗，避免鼠标快速移动时的闪烁
+  setTimeout(() => {
+    topBarStore.popupVisible.moments = false
+  }, 100)
+}
+
 defineExpose({
   checkIfHasNewMomentsThenUpdateMoments,
 })
@@ -285,6 +302,10 @@ defineExpose({
     pos="relative"
     shadow="[var(--bew-shadow-edge-glow-1),var(--bew-shadow-3)]"
     border="1 $bew-border-color"
+    class="moments-pop bew-popover"
+    data-key="moments"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
   >
     <!-- top bar -->
     <header

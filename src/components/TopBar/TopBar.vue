@@ -1,80 +1,104 @@
 <script setup lang="ts">
 import { onKeyStroke, useMouseInElement } from '@vueuse/core'
+import { nextTick, onMounted, onUnmounted, provide, ref } from 'vue'
 
 import { useBewlyApp } from '~/composables/useAppProvider'
 import { useDark } from '~/composables/useDark'
+import { OVERLAY_SCROLL_BAR_SCROLL, TOP_BAR_VISIBILITY_CHANGE } from '~/constants/globalEvents'
 import { settings } from '~/logic'
+import { useTopBarStore } from '~/stores/topBarStore'
+import { isHomePage } from '~/utils/main'
+import emitter from '~/utils/mitt'
 
 import NotificationsDrawer from './components/NotificationsDrawer.vue'
-import TopBarLogo from './components/TopBarLogo.vue'
-import TopBarRight from './components/TopBarRight.vue'
-import TopBarSearch from './components/TopBarSearch.vue'
-import { useTopBarCore } from './composables/useTopBarCore'
+import TopBarHeader from './components/TopBarHeader.vue'
 import { useTopBarInteraction } from './composables/useTopBarInteraction'
-import { useTopBarNotifications } from './composables/useTopBarNotifications'
-import { setupTopBarWatchers, useTopBarReactive } from './composables/useTopBarReactive'
-import { useTopBarScroll } from './composables/useTopBarScroll'
-
-const {
-  isLogin,
-  initData,
-  getUnreadMessageCount,
-  getTopBarNewMomentsCount,
-  headerTarget,
-} = useTopBarCore()
+import type { TopBarInteraction } from './types'
 
 const { scrollbarRef, reachTop } = useBewlyApp()
-const { isDark } = useDark()
-
-const { isOutside: isOutsideTopBar } = useMouseInElement(headerTarget)
-
+// 顶栏状态管理
+const topBarStore = useTopBarStore()
 const {
   drawerVisible,
   notificationsDrawerUrl,
-  handleNotificationsItemClick,
-} = useTopBarNotifications()
-
-const {
-  popupVisible,
-  setupTopBarItems,
-  setupClickOutside,
-} = useTopBarInteraction()
-
-const {
-  hideTopBar,
-  toggleTopBarVisible,
-  setupScrollListeners,
-  cleanupScrollListeners,
-  handleScroll,
-} = useTopBarScroll(scrollbarRef, isOutsideTopBar)
-
-const {
-  favoritesTransformer,
-} = setupTopBarItems()
-
-// 设置点击外部关闭
-setupClickOutside()
-
-const {
+  initData,
   forceWhiteIcon,
   isTopBarFixed,
   showTopBar,
-} = useTopBarReactive()
+  startUpdateTimer,
+  cleanup,
+} = topBarStore
 
-setupTopBarWatchers({
-  isLogin,
-  popupVisible,
-  drawerVisible,
-  getUnreadMessageCount,
-  getTopBarNewMomentsCount,
-  toggleTopBarVisible,
-  favoritesTransformer,
-})
+const { isDark } = useDark()
 
-// #endregion
+// 顶栏交互逻辑 - 确保正确初始化并提供给子组件
+const topBarInteraction = useTopBarInteraction()
+// 显式提供 TopBarInteraction 类型
+provide<TopBarInteraction>('topBarInteraction', topBarInteraction)
 
+// 顶栏显示控制
+const hideTopBar = ref<boolean>(false)
+const headerTarget = ref(null)
+const { isOutside: isOutsideTopBar } = useMouseInElement(headerTarget)
+
+// 滚动处理
+const scrollTop = ref<number>(0)
+const oldScrollTop = ref<number>(0)
+
+function handleScroll() {
+  if (isHomePage() && !settings.value.useOriginalBilibiliHomepage) {
+    const osInstance = scrollbarRef.value?.osInstance()
+    scrollTop.value = osInstance.elements().viewport.scrollTop as number
+  }
+  else {
+    scrollTop.value = document.documentElement.scrollTop
+  }
+
+  if (scrollTop.value === 0)
+    toggleTopBarVisible(true)
+
+  if (settings.value.autoHideTopBar && isOutsideTopBar && scrollTop.value !== 0) {
+    if (scrollTop.value > oldScrollTop.value)
+      toggleTopBarVisible(false)
+    else
+      toggleTopBarVisible(true)
+  }
+
+  oldScrollTop.value = scrollTop.value
+}
+
+function toggleTopBarVisible(visible: boolean) {
+  hideTopBar.value = !visible
+  emitter.emit(TOP_BAR_VISIBILITY_CHANGE, visible)
+}
+
+function setupScrollListeners() {
+  toggleTopBarVisible(true)
+  emitter.off(OVERLAY_SCROLL_BAR_SCROLL)
+  if (isHomePage() && !settings.value.useOriginalBilibiliHomepage) {
+    emitter.on(OVERLAY_SCROLL_BAR_SCROLL, () => {
+      handleScroll()
+    })
+  }
+  else {
+    window.addEventListener('scroll', handleScroll)
+  }
+}
+
+function cleanupScrollListeners() {
+  window.removeEventListener('scroll', handleScroll)
+  emitter.off(OVERLAY_SCROLL_BAR_SCROLL)
+}
+
+// 生命周期钩子
 onMounted(() => {
+  // 初始化数据和定时更新
   initData()
+  topBarInteraction.setupClickOutside()
+  startUpdateTimer()
+
+  topBarStore.setupWatchers(toggleTopBarVisible, topBarInteraction.setupTopBarItems().favoritesTransformer)
+
   nextTick(() => {
     setupScrollListeners()
   })
@@ -82,9 +106,11 @@ onMounted(() => {
 
 onUnmounted(() => {
   cleanupScrollListeners()
+  // 使用 store 中的方法清理定时器
+  cleanup()
 })
 
-// https://github.com/BewlyBewly/BewlyBewly/issues/1220
+// 快捷键
 onKeyStroke('/', () => {
   toggleTopBarVisible(true)
 })
@@ -104,57 +130,11 @@ defineExpose({
       :class="{ 'hide': hideTopBar, 'force-white-icon': forceWhiteIcon }"
       :style="{ position: isTopBarFixed ? 'fixed' : 'absolute' }"
     >
-      <main
-        max-w="$bew-page-max-width"
-        flex="~ justify-between items-center gap-4"
-        p="x-12" m-auto
-        h="$bew-top-bar-height"
-      >
-        <!-- Top bar mask -->
-        <div
-          v-if="!reachTop"
-          style="
-            mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 1) 24px, rgba(0, 0, 0, 0.9) 44px, transparent);
-          "
-          :style="{ backdropFilter: settings.disableFrostedGlass ? 'none' : 'blur(12px)' }"
-          pos="absolute top-0 left-0" w-full h="$bew-top-bar-height"
-          pointer-events-none transform-gpu
-        />
-
-        <div
-          pos="absolute top-0 left-0" w-full
-          pointer-events-none opacity-100 duration-300
-          :style="{
-            background: `linear-gradient(to bottom, ${
-              forceWhiteIcon
-                ? 'rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4) calc(var(--bew-top-bar-height) / 2)'
-                : 'color-mix(in oklab, var(--bew-bg), transparent 20%), color-mix(in oklab, var(--bew-bg), transparent 40%) calc(var(--bew-top-bar-height) / 2)'
-            }, transparent)`,
-            opacity: reachTop ? 0.8 : 1,
-            height: 'var(--bew-top-bar-height)',
-          }"
-        />
-
-        <!-- Top bar theme color gradient -->
-        <Transition name="fade">
-          <div
-            v-if="settings.showTopBarThemeColorGradient && !forceWhiteIcon && reachTop && isDark"
-            pos="absolute top-0 left-0" w-full h="$bew-top-bar-height" pointer-events-none
-            :style="{ background: 'linear-gradient(to bottom, var(--bew-theme-color-10), transparent)' }"
-          />
-        </Transition>
-
-        <TopBarLogo />
-
-        <!-- search bar -->
-        <TopBarSearch />
-
-        <!-- right content -->
-        <TopBarRight
-          :drawer-visible="drawerVisible"
-          @notifications-click="handleNotificationsItemClick"
-        />
-      </main>
+      <TopBarHeader
+        :force-white-icon="forceWhiteIcon"
+        :reach-top="reachTop"
+        :is-dark="isDark"
+      />
 
       <KeepAlive v-if="settings.openNotificationsPageAsDrawer">
         <NotificationsDrawer
