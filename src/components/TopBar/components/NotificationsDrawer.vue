@@ -159,6 +159,7 @@ nextTick(() => {
             w-inherit max-w-inherit h="$bew-top-bar-height"
             m-auto px-4
             pointer-events-none
+            bg="$bew-bg"
           >
             <h3 text="xl" fw-bold>
               {{ $t('topbar.notifications') }}
@@ -177,9 +178,6 @@ nextTick(() => {
                   <i i-mingcute:external-link-line />
                 </template>
                 {{ $t('iframe_drawer.open_in_new_tab') }}
-              <!-- <div flex="~">
-            <kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>T</kbd>
-          </div> -->
               </Button>
               <Button
                 v-if="!isEscPressed"
@@ -229,7 +227,11 @@ nextTick(() => {
               pointer-events-auto
               pos="relative right-0"
               w-inherit
-              max-w-inherit h-full @load="showIframe = true"
+              max-w-inherit
+              :style="{
+                height: 'calc(100%)',
+              }"
+              @load="showIframe = true"
             />
           </Transition>
         </div>
@@ -247,5 +249,18 @@ nextTick(() => {
 .drawer-enter-from,
 .drawer-leave-to {
   transform: translateX(100%);
+}
+
+/* 修改全局样式，避免重复设置 */
+:global(.photo-imager-container) {
+  /* 不再设置 top 和 height，避免与 iframe 样式冲突 */
+  position: fixed !important;
+  height: calc(100% - var(--bew-top-bar-height)) !important;
+  margin-top: var(--bew-top-bar-height) !important;
+}
+
+:global(.photo-imager-container .control-buttons) {
+  top: 20px !important; /* 增加顶部距离，避免与抽屉顶部按钮重叠 */
+  right: 20px !important;
 }
 </style>
