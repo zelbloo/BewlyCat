@@ -1,6 +1,7 @@
 import '~/styles'
 import 'uno.css'
 
+import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
 import { useDark } from '~/composables/useDark'
@@ -63,6 +64,8 @@ function isSupportedPages(): boolean {
     || /https?:\/\/message\.bilibili\.com\.*/.test(currentUrl)
     // bilibili channel page b站分区页面
     || /https?:\/\/(?:www\.)?bilibili\.com\/v\/(?!popular).*/.test(currentUrl)
+    // bilibili channel page 新版本页面
+    || /https?:\/\/(?:www\.)?bilibili\.com\/c\/(?!popular).*/.test(currentUrl)
     // anime page & chinese anime page
     || /https?:\/\/(?:www\.)?bilibili\.com\/(?:anime|guochuang).*/.test(currentUrl)
     // channel page e.g. tv shows, movie, variety shows, mooc page
@@ -396,6 +399,7 @@ function injectApp() {
   document.body.appendChild(container)
 
   const app = createApp(App)
+  app.use(createPinia())
   setupApp(app)
   app.mount(root)
 }

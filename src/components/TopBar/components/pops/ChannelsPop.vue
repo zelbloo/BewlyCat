@@ -1,7 +1,25 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 
+import { useTopBarStore } from '~/stores/topBarStore'
+
 const { t } = useI18n()
+
+// 添加鼠标事件处理函数
+function handleMouseEnter() {
+  const topBarStore = useTopBarStore()
+  topBarStore.setMouseOverPopup('channels', true)
+}
+
+function handleMouseLeave() {
+  const topBarStore = useTopBarStore()
+  topBarStore.setMouseOverPopup('channels', false)
+
+  // 延迟关闭弹窗，避免鼠标快速移动时的闪烁
+  setTimeout(() => {
+    topBarStore.popupVisible.channels = false
+  }, 100)
+}
 
 const genres = computed(() => [
   { name: t('topbar.logo_dropdown.anime'), icon: '#channel-anime', href: 'https://www.bilibili.com/anime' },
@@ -62,6 +80,10 @@ const otherLinks = computed(() => [
     bg="$bew-elevated-alt"
     rounded="$bew-radius"
     border="1 $bew-border-color"
+    class="channels-pop bew-popover"
+    data-key="channels"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
   >
     <div
       flex="~ gap-1"
@@ -128,11 +150,6 @@ const otherLinks = computed(() => [
 </template>
 
 <style lang="scss" scoped>
-.link-list {
-  // --uno: "last-of-type:p-4 last-of-type:bg-$bew-fill-1 last-of-type:h-fit last-of-type:m--4";
-  // --uno: "last-of-type:ml-2";
-}
-
 .link-item {
   --uno: "mb-1 last-of-type:mb-0 text-sm";
 

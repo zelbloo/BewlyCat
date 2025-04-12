@@ -3,6 +3,7 @@ import DOMPurify from 'dompurify'
 import { useI18n } from 'vue-i18n'
 
 import { settings } from '~/logic'
+import { useTopBarStore } from '~/stores/topBarStore'
 import api from '~/utils/api'
 import { revokeAccessKey } from '~/utils/authProvider'
 import { numFormatter } from '~/utils/dataFormatter'
@@ -14,6 +15,22 @@ import type { UserInfo, UserStat } from '../../types'
 const props = defineProps<{
   userInfo: UserInfo
 }>()
+
+// 添加鼠标事件处理函数
+function handleMouseEnter() {
+  const topBarStore = useTopBarStore()
+  topBarStore.setMouseOverPopup('userPanel', true)
+}
+
+function handleMouseLeave() {
+  const topBarStore = useTopBarStore()
+  topBarStore.setMouseOverPopup('userPanel', false)
+
+  // 延迟关闭弹窗，避免鼠标快速移动时的闪烁
+  setTimeout(() => {
+    topBarStore.popupVisible.userPanel = false
+  }, 100)
+}
 
 const { t } = useI18n()
 
@@ -139,6 +156,10 @@ function handleClickChannel() {
     p-4 rounded="$bew-radius" z--1 bg="$bew-elevated-alt"
     border="1 $bew-border-color"
     shadow="[var(--bew-shadow-3),var(--bew-shadow-edge-glow-1)]"
+    class="userPanel-pop bew-popover"
+    data-key="userPanel"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
   >
     <div
       text="xl" font-medium flex="~ items-center gap-2"
@@ -269,34 +290,11 @@ function handleClickChannel() {
       mb-2 p-2 bg="$bew-fill-alt" rounded="$bew-radius"
       shadow="[var(--bew-shadow-edge-glow-1),var(--bew-shadow-1)]"
     >
-      <a
+      <ALink
         v-for="item in otherLinks.filter((_, index) => index <= 1)"
         :key="item.url"
         :href="item.url"
-        target="_blank"
-        p="x-4 y-2" flex="~ items-center justify-between"
-        rounded="$bew-radius"
-        duration-300
-        bg="hover:$bew-fill-2"
-      >
-        <div flex="~ items-center gap-2">
-          <div :class="item.icon" text="$bew-text-2" />
-          {{ item.name }}
-        </div>
-        <div i-mingcute:arrow-right-line />
-      </a>
-    </div>
-
-    <div
-      flex="~ justify-between col gap-1"
-      p-2 bg="$bew-fill-alt" rounded="$bew-radius"
-      shadow="[var(--bew-shadow-edge-glow-1),var(--bew-shadow-1)]"
-    >
-      <a
-        v-for="item in otherLinks.filter((_, index) => index > 1)"
-        :key="item.url"
-        :href="item.url"
-        target="_blank"
+        type="topBar"
         p="x-4 y-2" flex="~ items-center justify-between"
         rounded="$bew-radius"
         duration-300
@@ -307,7 +305,30 @@ function handleClickChannel() {
           {{ item.name }}
         </div>
         <div i-mingcute:arrow-right-line />
-      </a>
+      </ALink>
+    </div>
+
+    <div
+      flex="~ justify-between col gap-1"
+      p-2 bg="$bew-fill-alt" rounded="$bew-radius"
+      shadow="[var(--bew-shadow-edge-glow-1),var(--bew-shadow-1)]"
+    >
+      <ALink
+        v-for="item in otherLinks.filter((_, index) => index > 1)"
+        :key="item.url"
+        :href="item.url"
+        type="topBar"
+        p="x-4 y-2" flex="~ items-center justify-between"
+        rounded="$bew-radius"
+        duration-300
+        hover:bg="$bew-fill-2"
+      >
+        <div flex="~ items-center gap-2">
+          <div :class="item.icon" text="$bew-text-2" />
+          {{ item.name }}
+        </div>
+        <div i-mingcute:arrow-right-line />
+      </ALink>
       <div
         text="$bew-error-color"
         p="x-4 y-2" flex="~ items-center"

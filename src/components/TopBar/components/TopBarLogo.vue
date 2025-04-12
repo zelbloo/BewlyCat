@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { settings } from '~/logic'
+import { useTopBarStore } from '~/stores/topBarStore'
 
-import { useTopBarCore } from '../composables/useTopBarCore'
 import { useTopBarInteraction } from '../composables/useTopBarInteraction'
-import { useTopBarReactive } from '../composables/useTopBarReactive'
 import BewlyOrBiliPageSwitcher from './BewlyOrBiliPageSwitcher.vue'
 import ChannelsPop from './pops/ChannelsPop.vue'
 
 const { popupVisible, handleClickTopBarItem, setupTopBarItems } = useTopBarInteraction()
-const { logo } = useTopBarCore()
-const { forceWhiteIcon } = useTopBarReactive()
+// const { logo } = useTopBarCore()
+const { logo, forceWhiteIcon } = useTopBarStore()
 const { channels } = setupTopBarItems()
 </script>
 

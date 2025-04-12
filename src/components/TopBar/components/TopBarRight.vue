@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import ALink from '~/components/ALink.vue'
 import { settings } from '~/logic'
+import { useTopBarStore } from '~/stores/topBarStore'
 import { getUserID } from '~/utils/main'
 
-import { useTopBarCore } from '../composables/useTopBarCore'
 import { useTopBarInteraction } from '../composables/useTopBarInteraction'
-import { useTopBarNotifications } from '../composables/useTopBarNotifications'
 import FavoritesPop from './pops/FavoritesPop.vue'
 import HistoryPop from './pops/HistoryPop.vue'
 import MomentsPop from './pops/MomentsPop.vue'
@@ -15,62 +14,75 @@ import UploadPop from './pops/UploadPop.vue'
 import UserPanelPop from './pops/UserPanelPop.vue'
 import WatchLaterPop from './pops/WatchLaterPop.vue'
 
-defineProps<{
-  forceWhiteIcon?: boolean
-  drawerVisible: { notifications: boolean }
-}>()
+defineProps({
+  forceWhiteIcon: {
+    type: Boolean,
+    default: false,
+  },
+})
 
-const emit = defineEmits<{
-  'notificationsClick': [item: { name: string, url: string, unreadCount: number, icon: string }]
-}>()
+const emit = defineEmits(['notificationsClick'])
 
+const topBarStore = useTopBarStore()
+// 使用 store
 const {
   isLogin,
   userInfo,
   unReadMessage,
   unReadDm,
-  unReadMessageCount,
   newMomentsCount,
+  drawerVisible,
+  popupVisible,
   avatarImg,
   avatarShadow,
-  initData,
-} = useTopBarCore()
+} = toRefs(topBarStore)
 
-const {
-  popupVisible,
-  handleClickTopBarItem,
-  setupTopBarItems,
-} = useTopBarInteraction()
+const unReadMessageCount = computed((): number => {
+  let result = 0
 
-const {
-  drawerVisible,
-} = useTopBarNotifications()
+  // 计算 unReadMessage 中的未读消息
+  Object.entries(unReadMessage).forEach(([key, value]) => {
+    if (key !== 'up' && key !== 'recv_reply' && key !== 'recv_like') {
+      if (typeof value === 'number')
+        result += value
+    }
+  })
+
+  // 计算 unReadDm 中的未读消息
+  if (typeof unReadDm.value.follow_unread === 'number')
+    result += unReadDm.value.follow_unread
+  if (typeof unReadDm.value.unfollow_unread === 'number')
+    result += unReadDm.value.unfollow_unread
+
+  return result
+})
+
+// // 使用 store 中的 newMomentsCount 作为数据源
+// const newMomentsCount = computed(() => storeNewMomentsCount)
+
+const { handleClickTopBarItem, setupTopBarItems } = useTopBarInteraction()
 
 const mid = getUserID() || ''
 
 const {
-  avatar,
-  notifications,
   moments,
   favorites,
   history,
   watchLater,
   upload,
+  notifications,
   more,
-  avatarTransformer,
-  notificationsTransformer,
+  avatar,
   momentsTransformer,
   favoritesTransformer,
-  historyTransformer,
   watchLaterTransformer,
+  historyTransformer,
   uploadTransformer,
+  notificationsTransformer,
   moreTransformer,
+  avatarTransformer,
 } = setupTopBarItems()
-
-// 添加 onMounted 钩子来初始化数据
-onMounted(() => {
-  initData()
-})
+// 定义 ref 元素
 
 // 修改通知点击处理
 function handleNotificationsClick(item: { name: string, url: string, unreadCount: number, icon: string }) {
@@ -400,4 +412,53 @@ function handleNotificationsClick(item: { name: string, url: string, unreadCount
 
 <style lang="scss" scoped>
 @import "../styles/index.scss";
+
+// 添加弹窗定位样式
+.right-side-item {
+  position: relative;
+}
+
+.bew-popover {
+  position: absolute;
+  top: 46px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+}
+
+// 用户面板弹窗特殊处理
+.avatar {
+  position: relative;
+  z-index: 1000; // 确保头像在弹出层之上
+
+  &.hover {
+    z-index: 1000; // 悬停时保持高层级
+  }
+
+  .avatar-img {
+    position: relative;
+    z-index: 1001; // 提高头像图片层级，确保在所有效果之上
+    isolation: isolate; // 创建新的层叠上下文
+
+    &.hover {
+      z-index: 1001; // 悬停时保持高层级
+    }
+  }
+
+  .avatar-shadow {
+    position: relative;
+    z-index: 999; // 阴影应该在图片下方
+  }
+
+  .vip-img {
+    z-index: 1002 !important; // VIP图标应该在最上层
+  }
+
+  .bew-popover {
+    left: auto;
+    right: 0;
+    transform: translateX(0);
+    z-index: 998; // 确保弹出层在头像下方
+  }
+}
 </style>

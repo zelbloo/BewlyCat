@@ -3,9 +3,26 @@ import Empty from '~/components/Empty.vue'
 import Loading from '~/components/Loading.vue'
 import Progress from '~/components/Progress.vue'
 import type { List as VideoItem, WatchLaterResult } from '~/models/video/watchLater'
+import { useTopBarStore } from '~/stores/topBarStore'
 import api from '~/utils/api'
 import { calcCurrentTime } from '~/utils/dataFormatter'
 import { getCSRF, removeHttpFromUrl } from '~/utils/main'
+
+// 添加鼠标事件处理函数
+function handleMouseEnter() {
+  const topBarStore = useTopBarStore()
+  topBarStore.setMouseOverPopup('watchLater', true)
+}
+
+function handleMouseLeave() {
+  const topBarStore = useTopBarStore()
+  topBarStore.setMouseOverPopup('watchLater', false)
+
+  // 延迟关闭弹窗，避免鼠标快速移动时的闪烁
+  setTimeout(() => {
+    topBarStore.popupVisible.watchLater = false
+  }, 100)
+}
 
 const watchLaterList = reactive<VideoItem[]>([])
 const isLoading = ref<boolean>()
@@ -69,6 +86,10 @@ function deleteWatchLaterItem(index: number, aid: number) {
     of="hidden"
     shadow="[var(--bew-shadow-edge-glow-1),var(--bew-shadow-3)]"
     border="1 $bew-border-color"
+    class="watchLater-pop bew-popover"
+    data-key="watchLater"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
   >
     <!-- top bar -->
     <header

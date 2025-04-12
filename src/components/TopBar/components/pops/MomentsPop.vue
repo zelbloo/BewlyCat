@@ -5,29 +5,24 @@ import { useI18n } from 'vue-i18n'
 import Empty from '~/components/Empty.vue'
 import Loading from '~/components/Loading.vue'
 import Tooltip from '~/components/Tooltip.vue'
-import type { TopBarLiveMomentResult } from '~/models/moment/topBarLiveMoment'
-import type { TopBarMomentResult } from '~/models/moment/topBarMoment'
+import { useTopBarStore } from '~/stores/topBarStore'
 import api from '~/utils/api'
 import { getCSRF, scrollToTop } from '~/utils/main'
 
 type MomentType = 'video' | 'live' | 'article'
 interface MomentTab { type: MomentType, name: any }
-interface MomentCard {
-  type: MomentType
-  title: string
-  author: string
-  authorFace: string
-  authorJumpUrl?: string
-  pubTime?: string
-  cover: string
-  link: string
-  rid?: number
-}
+
+const topBarStore = useTopBarStore()
+
+// 移除 toRefs 解构，直接使用 topBarStore.addedWatchLaterList
+// const {
+//   addedWatchLaterList,
+// } = toRefs(topBarStore)
 
 const { t } = useI18n()
 
-const moments = reactive<MomentCard[]>([])
-const addedWatchLaterList = reactive<number[]>([])
+// const moments = reactive<MomentCard[]>([])
+// const addedWatchLaterList = reactive<number[]>([])
 const momentTabs = computed((): MomentTab[] => {
   return [
     {
@@ -46,13 +41,8 @@ const momentTabs = computed((): MomentTab[] => {
 },
 )
 const selectedMomentTab = ref<MomentTab>(momentTabs.value[0])
-const isLoading = ref<boolean>(false)
-const noMoreContent = ref<boolean>(false) // when noMoreContent is true, the user can't scroll down to load more content
-const livePage = ref<number>(1)
+
 const momentsWrap = ref()
-const momentUpdateBaseline = ref<string>('')
-const momentOffset = ref<string>('')
-const newMomentsCount = ref<number>(0)
 
 watch(() => selectedMomentTab.value.type, (newVal, oldVal) => {
   if (newVal === oldVal)
@@ -70,8 +60,8 @@ onMounted(() => {
       if (
         momentsWrap.value.clientHeight + momentsWrap.value.scrollTop
         >= momentsWrap.value.scrollHeight - 20
-        && moments.length > 0
-        && !isLoading.value
+        && topBarStore.moments.length > 0
+        && !topBarStore.isLoadingMoments
       ) {
         getData()
       }
@@ -81,169 +71,24 @@ onMounted(() => {
 
 function onClickTab(tab: MomentTab) {
   // Prevent changing tab when loading, cuz it will cause a bug
-  if (isLoading.value || tab.type === selectedMomentTab.value.type)
+  if (topBarStore.isLoadingMoments || tab.type === selectedMomentTab.value.type)
     return
 
   selectedMomentTab.value = tab
   initData()
 }
 
-async function initData() {
-  moments.length = 0
-  momentUpdateBaseline.value = ''
-  momentOffset.value = ''
-  newMomentsCount.value = 0
-  livePage.value = 1
-  noMoreContent.value = false
-
-  getData()
+function initData() {
+  topBarStore.initMomentsData(selectedMomentTab.value.type)
 }
 
 function getData() {
-  if (selectedMomentTab.value.type !== 'live')
-    getTopBarMoments()
-  else
-    getTopBarLiveMoments()
-}
-
-function checkIfHasNewMomentsThenUpdateMoments() {
-  if (selectedMomentTab.value.type === 'live')
-    return
-
-  api.moment.getTopBarMoments({
-    type: selectedMomentTab.value.type,
-    update_baseline: momentUpdateBaseline.value || undefined,
-  })
-    .then((res: TopBarMomentResult) => {
-      if (res.code === 0) {
-        const { has_more, items, update_baseline, update_num } = res.data
-
-        if (!has_more) {
-          noMoreContent.value = true
-          return
-        }
-        if (update_num === 0)
-          return
-
-        for (let i = update_num - 1; i >= 0; i--) {
-          moments.unshift({
-            type: selectedMomentTab.value.type,
-            title: items[i].title,
-            author: items[i].author.name,
-            authorFace: items[i].author.face,
-            authorJumpUrl: items[i].author.jump_url,
-            pubTime: items[i].pub_time,
-            cover: items[i].cover,
-            link: items[i].jump_url,
-            rid: items[i].rid,
-          })
-        }
-
-        newMomentsCount.value = update_num
-        momentUpdateBaseline.value = update_baseline
-        // newMomentsCount.value = update_num
-        // setLastOffsetID('video', offset)
-      }
-    })
-    .finally(() => isLoading.value = false)
-}
-
-function getTopBarMoments() {
-  if (isLoading.value)
-    return
-  if (noMoreContent.value)
-    return
-
-  isLoading.value = true
-  api.moment.getTopBarMoments({
-    type: selectedMomentTab.value.type,
-    update_baseline: momentUpdateBaseline.value || undefined,
-    offset: momentOffset.value || undefined,
-  })
-    .then((res: TopBarMomentResult) => {
-      if (res.code === 0) {
-        const { has_more, items, offset, update_baseline, update_num } = res.data
-
-        if (!has_more) {
-          noMoreContent.value = true
-          return
-        }
-
-        newMomentsCount.value = update_num
-        momentUpdateBaseline.value = update_baseline
-        momentOffset.value = offset
-
-        // set this lastest offset id, which will clear the new moment's marker point
-        // after you watch these moments.
-
-        // setLastOffsetID('video', offset)
-
-        moments.push(
-          ...items.map(item => ({
-            type: selectedMomentTab.value.type,
-            title: item.title,
-            author: item.author.name,
-            authorFace: item.author.face,
-            authorJumpUrl: item.author.jump_url,
-            pubTime: item.pub_time,
-            cover: item.cover,
-            link: item.jump_url,
-            rid: item.rid,
-          }),
-          ),
-        )
-      }
-    })
-    .finally(() => isLoading.value = false)
-}
-
-function isNewMoment(index: number) {
-  return index < newMomentsCount.value
-}
-
-function getTopBarLiveMoments() {
-  if (isLoading.value)
-    return
-  if (noMoreContent.value)
-    return
-
-  isLoading.value = true
-  const pageSize = 10
-  api.moment.getTopBarLiveMoments({
-    page: livePage.value,
-    pagesize: pageSize,
-  })
-    .then((res: TopBarLiveMomentResult) => {
-      if (res.code === 0) {
-        const { list } = res.data
-
-        // if the length of this list is less then the pageSize, it means that it have no more contents
-        if (list.length < pageSize) {
-          noMoreContent.value = true
-        }
-
-        // if the length of this list is equal to the pageSize, this means that it may have the next page.
-        if (list.length === pageSize)
-          livePage.value++
-
-        moments.push(
-          ...list.map(item => ({
-            type: selectedMomentTab.value.type,
-            title: item.title,
-            author: item.uname,
-            authorFace: item.face,
-            cover: item.pic,
-            link: item.link,
-          }),
-          ),
-        )
-      }
-    })
-    .finally(() => isLoading.value = false)
+  topBarStore.getMomentsData(selectedMomentTab.value.type)
 }
 
 function toggleWatchLater(aid: number) {
-  const isInWatchLater = addedWatchLaterList.includes(aid)
+  // 修改这里，直接使用 topBarStore.addedWatchLaterList
+  const isInWatchLater = topBarStore.addedWatchLaterList.includes(aid)
 
   if (!isInWatchLater) {
     api.watchlater.saveToWatchLater({
@@ -252,7 +97,7 @@ function toggleWatchLater(aid: number) {
     })
       .then((res) => {
         if (res.code === 0)
-          addedWatchLaterList.push(aid)
+          topBarStore.addedWatchLaterList.push(aid)
       })
   }
   else {
@@ -262,16 +107,30 @@ function toggleWatchLater(aid: number) {
     })
       .then((res) => {
         if (res.code === 0) {
-          addedWatchLaterList.length = 0
-          Object.assign(addedWatchLaterList, addedWatchLaterList.filter(item => item !== aid))
+          topBarStore.addedWatchLaterList.length = 0
+          Object.assign(topBarStore.addedWatchLaterList, topBarStore.addedWatchLaterList.filter(item => item !== aid))
         }
       })
   }
 }
 
-defineExpose({
-  checkIfHasNewMomentsThenUpdateMoments,
-})
+// 添加鼠标事件处理函数
+function handleMouseEnter() {
+  topBarStore.setMouseOverPopup('moments', true)
+}
+
+function handleMouseLeave() {
+  topBarStore.setMouseOverPopup('moments', false)
+
+  // 延迟关闭弹窗，避免鼠标快速移动时的闪烁
+  setTimeout(() => {
+    topBarStore.popupVisible.moments = false
+  }, 100)
+}
+
+// defineExpose({
+//   checkIfHasNewMomentsThenUpdateMoments,
+// })
 </script>
 
 <template>
@@ -285,6 +144,10 @@ defineExpose({
     pos="relative"
     shadow="[var(--bew-shadow-edge-glow-1),var(--bew-shadow-3)]"
     border="1 $bew-border-color"
+    class="moments-pop bew-popover"
+    data-key="moments"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
   >
     <!-- top bar -->
     <header
@@ -323,7 +186,7 @@ defineExpose({
     <main rounded="$bew-radius" overflow-hidden p="x-4">
       <!-- loading -->
       <Loading
-        v-if="isLoading && moments.length === 0"
+        v-if="topBarStore.isLoadingMoments && topBarStore.moments.length === 0"
         h="full"
         flex="~"
         items="center"
@@ -331,7 +194,7 @@ defineExpose({
 
       <!-- empty -->
       <Empty
-        v-if="!isLoading && moments.length === 0"
+        v-if="!topBarStore.isLoadingMoments && topBarStore.moments.length === 0"
         pos="absolute top-0 left-0"
         bg="$bew-content"
         z="0" w="full" h="full"
@@ -342,7 +205,7 @@ defineExpose({
       <!-- moments -->
       <TransitionGroup name="list">
         <ALink
-          v-for="(moment, index) in moments"
+          v-for="(moment, index) in topBarStore.moments"
           :key="index"
           :href="moment.link"
           type="topBar"
@@ -355,7 +218,7 @@ defineExpose({
         >
           <!-- new moment dot -->
           <div
-            v-if="isNewMoment(index)"
+            v-if="topBarStore.isNewMoment(index)"
             rounded="full"
             w="8px"
             h="8px"
@@ -428,6 +291,7 @@ defineExpose({
                 w="82px" h="46px"
                 rounded="$bew-radius-half"
               >
+              <!-- 修改这里，使用 topBarStore.addedWatchLaterList -->
               <div
                 opacity-0 group-hover:opacity-100
                 pos="absolute" duration-300 bg="black opacity-60"
@@ -435,7 +299,7 @@ defineExpose({
                 z-1 color-white
                 @click.prevent="toggleWatchLater(moment.rid || 0)"
               >
-                <Tooltip v-if="!addedWatchLaterList.includes(moment.rid || 0)" :content="$t('common.save_to_watch_later')" placement="bottom" type="dark">
+                <Tooltip v-if="!topBarStore.addedWatchLaterList.includes(moment.rid || 0)" :content="$t('common.save_to_watch_later')" placement="bottom" type="dark">
                   <div i-mingcute:carplay-line />
                 </Tooltip>
                 <Tooltip v-else :content="$t('common.added')" placement="bottom" type="dark">
@@ -449,7 +313,7 @@ defineExpose({
 
       <!-- loading -->
       <Transition name="fade">
-        <Loading v-if="isLoading && moments.length !== 0" m="-t-4" />
+        <Loading v-if="topBarStore.isLoadingMoments && topBarStore.moments.length !== 0" m="-t-4" />
       </Transition>
     </main>
   </div>

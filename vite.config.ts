@@ -11,7 +11,7 @@ import type { UserConfig } from 'vite'
 import { defineConfig } from 'vite'
 
 import { isDev, isFirefox, isSafari, port, r } from './scripts/utils'
-import { MV3Hmr } from './vite-mv3-hmr'
+// import { MV3Hmr } from './vite-mv3-hmr'
 
 export const sharedConfig: UserConfig = {
   root: r('src'),
@@ -87,7 +87,7 @@ export default defineConfig(({ command }) => ({
   },
   build: {
     outDir: r(isFirefox ? 'extension-firefox/dist' : isSafari ? 'extension-safari/dist' : 'extension/dist'),
-    emptyOutDir: false,
+    emptyOutDir: true,
     sourcemap: false, // https://github.com/vitejs/vite-plugin-vue/issues/35
     // https://developer.chrome.com/docs/webstore/program_policies/#:~:text=Code%20Readability%20Requirements
     terserOptions: {
@@ -104,7 +104,7 @@ export default defineConfig(({ command }) => ({
   plugins: [
     ...sharedConfig.plugins!,
 
-    MV3Hmr(),
+    // MV3Hmr(),
   ],
   test: {
     globals: true,
