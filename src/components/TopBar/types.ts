@@ -123,7 +123,7 @@ export interface TopBarTransformers {
 }
 
 export interface TopBarInteraction {
-  popupVisible: PopupVisibleState
+  // popupVisible: PopupVisibleState
   currentClickedTopBarItem: Ref<string | null>
   handleClickTopBarItem: (event: MouseEvent, key: string) => void
   setupTopBarItems: () => any

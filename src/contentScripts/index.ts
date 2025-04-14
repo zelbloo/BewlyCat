@@ -1,7 +1,6 @@
 import '~/styles'
 import 'uno.css'
 
-import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
 import { useDark } from '~/composables/useDark'
@@ -399,7 +398,6 @@ function injectApp() {
   document.body.appendChild(container)
 
   const app = createApp(App)
-  app.use(createPinia())
   setupApp(app)
   app.mount(root)
 }

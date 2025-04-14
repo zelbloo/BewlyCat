@@ -94,16 +94,25 @@ const needToLoginFirst = ref<boolean>(false)
 const containerRef = ref<HTMLElement>() as Ref<HTMLElement>
 const refreshIdx = ref<number>(1)
 const noMoreContent = ref<boolean>(false)
-const { handleReachBottom, handlePageRefresh, haveScrollbar, showUndoButton, handleUndoRefresh } = useBewlyApp()
+const { handleReachBottom, handlePageRefresh, haveScrollbar, showUndoButton, handleUndoRefresh, handleForwardRefresh } = useBewlyApp()
 const activatedAppVideo = ref<AppVideoItem | null>()
 const videoCardRef = ref(null)
 const showDislikeDialog = ref<boolean>(false)
 const selectedDislikeReason = ref<number>(1)
 
-// 添加缓存数据变量
+// 修改缓存数据变量，添加前进状态变量
 const cachedVideoList = ref<VideoElement[]>([])
 const cachedAppVideoList = ref<AppVideoElement[]>([])
 const cachedRefreshIdx = ref<number>(1)
+
+// 添加前进状态变量
+const forwardVideoList = ref<VideoElement[]>([])
+const forwardAppVideoList = ref<AppVideoElement[]>([])
+const forwardRefreshIdx = ref<number>(1)
+
+// 添加状态标记
+const hasBackState = ref<boolean>(false)
+const hasForwardState = ref<boolean>(false)
 
 // 添加请求限制相关的变量
 const requestCount = ref<number>(0)
@@ -227,10 +236,25 @@ function initPageAction() {
     if (isLoading.value)
       return
 
-    // 保存当前数据到缓存
-    cachedVideoList.value = JSON.parse(JSON.stringify(videoList.value))
-    cachedAppVideoList.value = JSON.parse(JSON.stringify(appVideoList.value))
-    cachedRefreshIdx.value = refreshIdx.value
+    // 如果当前已经是后退状态，则保存当前数据到前进状态
+    if (hasBackState.value) {
+      forwardVideoList.value = JSON.parse(JSON.stringify(videoList.value))
+      forwardAppVideoList.value = JSON.parse(JSON.stringify(appVideoList.value))
+      forwardRefreshIdx.value = refreshIdx.value
+      hasForwardState.value = true
+    }
+    else {
+      // 保存当前数据到后退缓存
+      cachedVideoList.value = JSON.parse(JSON.stringify(videoList.value))
+      cachedAppVideoList.value = JSON.parse(JSON.stringify(appVideoList.value))
+      cachedRefreshIdx.value = refreshIdx.value
+      hasBackState.value = true
+
+      // 清空前进状态
+      forwardVideoList.value = []
+      forwardAppVideoList.value = []
+      hasForwardState.value = false
+    }
 
     // 显示撤销按钮
     showUndoButton.value = true
@@ -238,22 +262,47 @@ function initPageAction() {
     initData()
   }
 
-  // 添加撤销刷新的处理函数
+  // 修改撤销刷新的处理函数
   handleUndoRefresh.value = () => {
-    if (cachedVideoList.value.length > 0 || cachedAppVideoList.value.length > 0) {
+    if (hasBackState.value && cachedVideoList.value.length > 0) {
+      // 保存当前数据到前进状态
+      forwardVideoList.value = JSON.parse(JSON.stringify(videoList.value))
+      forwardAppVideoList.value = JSON.parse(JSON.stringify(appVideoList.value))
+      forwardRefreshIdx.value = refreshIdx.value
+      hasForwardState.value = true
+
       // 恢复缓存的数据
       videoList.value = cachedVideoList.value
       appVideoList.value = cachedAppVideoList.value
       refreshIdx.value = cachedRefreshIdx.value
 
-      // 隐藏撤销按钮
+      // 标记为已经后退
+      hasBackState.value = false
       showUndoButton.value = false
-
-      // 清空缓存
-      cachedVideoList.value = []
-      cachedAppVideoList.value = []
     }
   }
+}
+
+// 添加前进功能
+handleForwardRefresh.value = () => {
+  if (hasForwardState.value && forwardVideoList.value.length > 0) {
+    // 保存当前数据到后退状态
+    cachedVideoList.value = JSON.parse(JSON.stringify(videoList.value))
+    cachedAppVideoList.value = JSON.parse(JSON.stringify(appVideoList.value))
+    cachedRefreshIdx.value = refreshIdx.value
+    hasBackState.value = true
+
+    // 恢复前进状态的数据
+    videoList.value = forwardVideoList.value
+    appVideoList.value = forwardAppVideoList.value
+    refreshIdx.value = forwardRefreshIdx.value
+
+    // 标记为已经前进
+    hasForwardState.value = false
+    showUndoButton.value = true
+    return true
+  }
+  return false
 }
 
 async function getRecommendVideos() {
@@ -438,6 +487,11 @@ defineExpose({
   undoRefresh: () => {
     handleUndoRefresh.value?.()
   },
+  goForward: () => {
+    handleForwardRefresh.value?.()
+  },
+  canGoBack: () => hasBackState.value,
+  canGoForward: () => hasForwardState.value,
 })
 </script>
 

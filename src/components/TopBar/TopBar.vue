@@ -18,22 +18,12 @@ import type { TopBarInteraction } from './types'
 const { scrollbarRef, reachTop } = useBewlyApp()
 // 顶栏状态管理
 const topBarStore = useTopBarStore()
-const {
-  drawerVisible,
-  notificationsDrawerUrl,
-  initData,
-  forceWhiteIcon,
-  isTopBarFixed,
-  showTopBar,
-  startUpdateTimer,
-  cleanup,
-} = topBarStore
 
 const { isDark } = useDark()
 
 // 顶栏交互逻辑 - 确保正确初始化并提供给子组件
 const topBarInteraction = useTopBarInteraction()
-// 显式提供 TopBarInteraction 类型
+// // 显式提供 TopBarInteraction 类型
 provide<TopBarInteraction>('topBarInteraction', topBarInteraction)
 
 // 顶栏显示控制
@@ -92,14 +82,21 @@ function cleanupScrollListeners() {
 
 // 生命周期钩子
 onMounted(() => {
-  // 初始化数据和定时更新
-  initData()
-  topBarInteraction.setupClickOutside()
-  startUpdateTimer()
-
-  topBarStore.setupWatchers(toggleTopBarVisible, topBarInteraction.setupTopBarItems().favoritesTransformer)
-
   nextTick(() => {
+    // 先初始化数据
+    topBarStore.initData()
+    topBarInteraction.setupClickOutside()
+
+    // 启动定时器
+    topBarStore.startUpdateTimer()
+
+    // 确保 setupTopBarItems 返回值存在再传递给 setupWatchers
+    const items = topBarInteraction.setupTopBarItems()
+    topBarStore.setupWatchers(
+      toggleTopBarVisible,
+      items?.favoritesTransformer || { value: null },
+    )
+
     setupScrollListeners()
   })
 })
@@ -107,7 +104,7 @@ onMounted(() => {
 onUnmounted(() => {
   cleanupScrollListeners()
   // 使用 store 中的方法清理定时器
-  cleanup()
+  topBarStore.cleanup()
 })
 
 // 快捷键
@@ -124,23 +121,23 @@ defineExpose({
 <template>
   <Transition name="top-bar">
     <header
-      v-if="showTopBar"
+      v-if="topBarStore.showTopBar"
       ref="headerTarget"
       w="full" transition="all 300 ease-in-out"
-      :class="{ 'hide': hideTopBar, 'force-white-icon': forceWhiteIcon }"
-      :style="{ position: isTopBarFixed ? 'fixed' : 'absolute' }"
+      :class="{ 'hide': hideTopBar, 'force-white-icon': topBarStore.forceWhiteIcon }"
+      :style="{ position: topBarStore.isTopBarFixed ? 'fixed' : 'absolute' }"
     >
       <TopBarHeader
-        :force-white-icon="forceWhiteIcon"
+        :force-white-icon="topBarStore.forceWhiteIcon"
         :reach-top="reachTop"
         :is-dark="isDark"
       />
 
       <KeepAlive v-if="settings.openNotificationsPageAsDrawer">
         <NotificationsDrawer
-          v-if="drawerVisible.notifications"
-          :url="notificationsDrawerUrl"
-          @close="drawerVisible.notifications = false"
+          v-if="topBarStore.drawerVisible.notifications"
+          :url="topBarStore.notificationsDrawerUrl"
+          @close="topBarStore.drawerVisible.notifications = false"
         />
       </KeepAlive>
     </header>

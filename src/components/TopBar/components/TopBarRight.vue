@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
+
 import ALink from '~/components/ALink.vue'
 import { settings } from '~/logic'
 import { useTopBarStore } from '~/stores/topBarStore'
@@ -14,17 +17,10 @@ import UploadPop from './pops/UploadPop.vue'
 import UserPanelPop from './pops/UserPanelPop.vue'
 import WatchLaterPop from './pops/WatchLaterPop.vue'
 
-defineProps({
-  forceWhiteIcon: {
-    type: Boolean,
-    default: false,
-  },
-})
-
 const emit = defineEmits(['notificationsClick'])
 
 const topBarStore = useTopBarStore()
-// 使用 store
+// 使用 store 中的必要状态
 const {
   isLogin,
   userInfo,
@@ -33,32 +29,13 @@ const {
   newMomentsCount,
   drawerVisible,
   popupVisible,
-  avatarImg,
-  avatarShadow,
-} = toRefs(topBarStore)
+  forceWhiteIcon,
+  unReadMessageCount,
+} = storeToRefs(topBarStore)
 
-const unReadMessageCount = computed((): number => {
-  let result = 0
-
-  // 计算 unReadMessage 中的未读消息
-  Object.entries(unReadMessage).forEach(([key, value]) => {
-    if (key !== 'up' && key !== 'recv_reply' && key !== 'recv_like') {
-      if (typeof value === 'number')
-        result += value
-    }
-  })
-
-  // 计算 unReadDm 中的未读消息
-  if (typeof unReadDm.value.follow_unread === 'number')
-    result += unReadDm.value.follow_unread
-  if (typeof unReadDm.value.unfollow_unread === 'number')
-    result += unReadDm.value.unfollow_unread
-
-  return result
-})
-
-// // 使用 store 中的 newMomentsCount 作为数据源
-// const newMomentsCount = computed(() => storeNewMomentsCount)
+// 将 DOM 引用移到组件内部
+const avatarImg = ref<HTMLElement | null>(null)
+const avatarShadow = ref<HTMLElement | null>(null)
 
 const { handleClickTopBarItem, setupTopBarItems } = useTopBarInteraction()
 
@@ -82,7 +59,6 @@ const {
   moreTransformer,
   avatarTransformer,
 } = setupTopBarItems()
-// 定义 ref 元素
 
 // 修改通知点击处理
 function handleNotificationsClick(item: { name: string, url: string, unreadCount: number, icon: string }) {

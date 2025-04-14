@@ -121,15 +121,6 @@ nextTick(() => {
     }
   }, { target: iframeRef.value?.contentWindow })
 })
-
-// const keys = useMagicKeys()
-// const ctrlAltT = keys['Ctrl+Alt+T']
-
-// watch(() => ctrlAltT, (value) => {
-//   if (value) {
-//     handleOpenInNewTab()
-//   }
-// })
 </script>
 
 <template>

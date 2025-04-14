@@ -14,15 +14,8 @@ interface MomentTab { type: MomentType, name: any }
 
 const topBarStore = useTopBarStore()
 
-// 移除 toRefs 解构，直接使用 topBarStore.addedWatchLaterList
-// const {
-//   addedWatchLaterList,
-// } = toRefs(topBarStore)
-
 const { t } = useI18n()
 
-// const moments = reactive<MomentCard[]>([])
-// const addedWatchLaterList = reactive<number[]>([])
 const momentTabs = computed((): MomentTab[] => {
   return [
     {

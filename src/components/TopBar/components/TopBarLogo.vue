@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
+
 import { settings } from '~/logic'
 import { useTopBarStore } from '~/stores/topBarStore'
 
@@ -6,9 +9,11 @@ import { useTopBarInteraction } from '../composables/useTopBarInteraction'
 import BewlyOrBiliPageSwitcher from './BewlyOrBiliPageSwitcher.vue'
 import ChannelsPop from './pops/ChannelsPop.vue'
 
-const { popupVisible, handleClickTopBarItem, setupTopBarItems } = useTopBarInteraction()
-// const { logo } = useTopBarCore()
-const { logo, forceWhiteIcon } = useTopBarStore()
+const { handleClickTopBarItem, setupTopBarItems } = useTopBarInteraction()
+const topBarStore = useTopBarStore()
+const { forceWhiteIcon, popupVisible } = storeToRefs(topBarStore)
+const logo = ref<HTMLElement | null>(null)
+
 const { channels } = setupTopBarItems()
 </script>
 

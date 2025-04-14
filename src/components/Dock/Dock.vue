@@ -26,11 +26,14 @@ const emit = defineEmits<{
   (e: 'refresh'): void
   (e: 'backToTop'): void
   (e: 'undoRefresh'): void
+  (e: 'forwardRefresh'): void
 }>()
 
 const mainStore = useMainStore()
 const { isDark, toggleDark } = useDark()
 const { reachTop, showUndoButton } = useBewlyApp()
+// 添加前进按钮状态
+const showForwardButton = ref<boolean>(false)
 
 const hideDock = ref<boolean>(false)
 const dockContentHover = ref<boolean>(false)
@@ -175,6 +178,25 @@ function handleBackToTopOrRefresh(action: 'backToTop' | 'refresh' | 'auto' = 'au
 // 处理撤销刷新
 function handleUndoRefresh() {
   emit('undoRefresh')
+  showForwardButton.value = true
+  showUndoButton.value = false
+}
+
+// 添加处理前进的方法
+function handleForwardRefresh() {
+  emit('forwardRefresh')
+  showUndoButton.value = true
+  showForwardButton.value = false
+}
+
+// 添加统一的前进后退处理方法
+function handleHistoryNavigation() {
+  if (showUndoButton.value) {
+    handleUndoRefresh()
+  }
+  else if (showForwardButton.value) {
+    handleForwardRefresh()
+  }
 }
 
 function isDockItemActivated(dockItem: DockItem): boolean {
@@ -404,17 +426,24 @@ const dockTransformStyle = computed((): { transform: string, transformOrigin: st
             </Transition>
           </button>
         </template>
+        <!-- 将原来的两个按钮替换为一个 -->
         <Transition name="fade">
           <button
-            v-if="showUndoButton && settings.enableUndoRefreshButton"
+            v-if="(showUndoButton || showForwardButton) && settings.enableUndoRefreshButton"
             class="back-to-top-or-refresh-btn"
             :class="{
               inactive: hoveringDockItem.themeMode && isDark,
             }"
-            @click="handleUndoRefresh"
+            @click="handleHistoryNavigation"
           >
             <Icon
+              v-if="showUndoButton"
               icon="mdi:undo-variant"
+              shrink-0 absolute text-2xl
+            />
+            <Icon
+              v-else-if="showForwardButton"
+              icon="mdi:redo-variant"
               shrink-0 absolute text-2xl
             />
           </button>
