@@ -8,8 +8,7 @@ import { createTransformer } from '~/utils/transformer'
 
 export function useTopBarInteraction() {
   const topBarStore = useTopBarStore()
-  const { popupVisible, closeAllPopups } = topBarStore
-
+  const { closeAllPopups } = topBarStore
   // 顶栏元素引用
   const topBarItemElements = reactive({})
   const topBarTransformers = reactive({})
@@ -27,13 +26,13 @@ export function useTopBarInteraction() {
       leaveDelay: 320,
       beforeEnter: () => closeAllPopups(key),
       enter: () => {
-        popupVisible[key] = true
+        topBarStore.popupVisible[key] = true
       },
       leave: () => {
         // 只有当鼠标不在弹窗上时才隐藏
         setTimeout(() => {
           if (!isMouseOverPopup[key]) {
-            popupVisible[key] = false
+            topBarStore.popupVisible[key] = false
           }
         }, 200)
       },
@@ -62,7 +61,7 @@ export function useTopBarInteraction() {
     if (settings.value.touchScreenOptimization) {
       event.preventDefault()
       closeAllPopups(key)
-      popupVisible[key] = !popupVisible[key]
+      topBarStore.popupVisible[key] = !topBarStore.popupVisible[key]
       currentClickedTopBarItem.value = key
     }
   }
@@ -79,7 +78,7 @@ export function useTopBarInteraction() {
         // 鼠标进入图标时显示弹窗
         element.addEventListener('mouseenter', () => {
           closeAllPopups(key)
-          popupVisible[key] = true
+          topBarStore.popupVisible[key] = true
         })
 
         // 鼠标离开图标时，检查是否进入了弹窗
@@ -87,7 +86,7 @@ export function useTopBarInteraction() {
           // 延迟处理，给用户足够时间移动到弹窗
           setTimeout(() => {
             if (!topBarStore.getMouseOverPopup(key)) {
-              popupVisible[key] = false
+              topBarStore.popupVisible[key] = false
             }
           }, 200)
         })
@@ -153,7 +152,6 @@ export function useTopBarInteraction() {
   }
 
   return {
-    popupVisible,
     currentClickedTopBarItem,
     handleClickTopBarItem,
     setupTopBarItems,

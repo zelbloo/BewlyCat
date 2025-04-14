@@ -27,14 +27,29 @@ import { getCSRF, isHomePage, isInIframe } from '~/utils/main'
 export const useTopBarStore = defineStore('topBar', () => {
   const isLogin = ref<boolean>(true)
   const userInfo = reactive<UserInfo>({} as UserInfo)
-  const logo = ref<HTMLElement>() as Ref<HTMLElement>
-  const avatarImg = ref<HTMLElement>() as Ref<HTMLElement>
-  const avatarShadow = ref<HTMLElement>() as Ref<HTMLElement>
 
   const unReadMessage = reactive<UnReadMessage>({} as UnReadMessage)
   const unReadDm = reactive<UnReadDm>({} as UnReadDm)
 
-  // 移除 unReadMessageCount 计算属性
+  const unReadMessageCount = computed((): number => {
+    let result = 0
+
+    // 计算 unReadMessage 中的未读消息
+    Object.entries(unReadMessage).forEach(([key, value]) => {
+      if (key !== 'up' && key !== 'recv_reply' && key !== 'recv_like') {
+        if (typeof value === 'number')
+          result += value
+      }
+    })
+
+    // 计算 unReadDm 中的未读消息
+    if (typeof unReadDm.follow_unread === 'number')
+      result += unReadDm.follow_unread
+    if (typeof unReadDm.unfollow_unread === 'number')
+      result += unReadDm.unfollow_unread
+
+    return result
+  })
 
   // Moments State
   const newMomentsCount = ref<number>(0)
@@ -73,6 +88,9 @@ export const useTopBarStore = defineStore('topBar', () => {
   })
 
   const forceWhiteIcon = computed((): boolean => {
+    if (!settings.value)
+      return false
+
     if (
       (isHomePage() && settings.value.useOriginalBilibiliHomepage)
       || (isInIframe() && isHomePage())
@@ -84,6 +102,10 @@ export const useTopBarStore = defineStore('topBar', () => {
     }
 
     if (!isHomePage())
+      return false
+
+    // 确保 activatedPage.value 存在
+    if (!activatedPage?.value)
       return false
 
     if (activatedPage.value === AppPage.Search) {
@@ -399,16 +421,17 @@ export const useTopBarStore = defineStore('topBar', () => {
     })
   }
 
-  function setupWatchers(toggleTopBarVisible: (visible: boolean) => void, favoritesTransformer: Ref<any>) {
-    // 自动隐藏顶栏设置监听
-    watch(() => settings.value.autoHideTopBar, (newVal) => {
+  function setupWatchers(toggleTopBarVisible: (visible: boolean) => void, favoritesTransformer: any) {
+    watch(() => settings.value?.autoHideTopBar ?? false, (newVal) => {
+      if (newVal === undefined)
+        return
       if (!newVal)
         toggleTopBarVisible(true)
     })
 
     // 通知相关监听
     watch(
-      () => popupVisible.notifications,
+      () => popupVisible.notifications ?? false,
       (newVal, oldVal) => {
         if (oldVal === undefined && MESSAGE_URL.test(location.href))
           return
@@ -423,7 +446,7 @@ export const useTopBarStore = defineStore('topBar', () => {
     )
 
     watch(
-      () => drawerVisible.notifications,
+      () => drawerVisible.notifications ?? false,
       (newVal, oldVal) => {
         if (newVal === oldVal)
           return
@@ -440,7 +463,7 @@ export const useTopBarStore = defineStore('topBar', () => {
     })
 
     watch(
-      () => popupVisible.moments,
+      () => popupVisible.moments ?? false,
       async (newVal, oldVal) => {
         if (newVal === oldVal)
           return
@@ -461,12 +484,13 @@ export const useTopBarStore = defineStore('topBar', () => {
       { immediate: true },
     )
 
-    watch(() => popupVisible.favorites, (newVal, oldVal) => {
+    watch(() => popupVisible.favorites ?? false, (newVal, oldVal) => {
       if (newVal === oldVal)
         return
-      if (newVal) {
+      // 确保 favoritesTransformer 存在
+      if (newVal && favoritesTransformer) {
         nextTick(() => {
-          if (favoritesTransformer.value)
+          if (favoritesTransformer?.value)
             favoritesTransformer.value.refreshFavoriteResources()
         })
       }
@@ -479,7 +503,7 @@ export const useTopBarStore = defineStore('topBar', () => {
     getUserInfo()
     getUnreadMessageCount()
     getTopBarNewMomentsCount()
-    startUpdateTimer()
+    // startUpdateTimer()
   }
 
   function startUpdateTimer() {
@@ -532,28 +556,22 @@ export const useTopBarStore = defineStore('topBar', () => {
   }
 
   return {
-    // State
     isLogin,
     userInfo,
     unReadMessage,
-    logo,
-    avatarImg,
-    avatarShadow,
     unReadDm,
-    // 移除 unReadMessageCount
+    unReadMessageCount,
     newMomentsCount,
     drawerVisible,
     notificationsDrawerUrl,
     popupVisible,
 
-    // 从 useTopBarReactive 整合的计算属性
     isSearchPage,
     forceWhiteIcon,
     showSearchBar,
     isTopBarFixed,
     showTopBar,
 
-    // Methods
     getUserInfo,
     getUnreadMessageCount,
     getTopBarNewMomentsCount,
