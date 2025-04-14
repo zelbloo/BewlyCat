@@ -166,7 +166,7 @@ export const originalSettings: Settings = {
   disableDockGlowingEffect: false,
   disableLightDarkModeSwitcherOnDock: false,
   backToTopAndRefreshButtonsAreSeparated: true,
-  enableUndoRefreshButton: false, // 默认关闭撤销刷新按钮
+  enableUndoRefreshButton: true, // 默认开启撤销刷新按钮
 
   sidebarPosition: 'right',
   autoHideSidebar: false,
