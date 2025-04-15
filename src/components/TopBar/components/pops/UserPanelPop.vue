@@ -3,7 +3,6 @@ import DOMPurify from 'dompurify'
 import { useI18n } from 'vue-i18n'
 
 import { settings } from '~/logic'
-import { useTopBarStore } from '~/stores/topBarStore'
 import api from '~/utils/api'
 import { revokeAccessKey } from '~/utils/authProvider'
 import { numFormatter } from '~/utils/dataFormatter'
@@ -15,22 +14,6 @@ import type { UserInfo, UserStat } from '../../types'
 const props = defineProps<{
   userInfo: UserInfo
 }>()
-
-// 添加鼠标事件处理函数
-function handleMouseEnter() {
-  const topBarStore = useTopBarStore()
-  topBarStore.setMouseOverPopup('userPanel', true)
-}
-
-function handleMouseLeave() {
-  const topBarStore = useTopBarStore()
-  topBarStore.setMouseOverPopup('userPanel', false)
-
-  // 延迟关闭弹窗，避免鼠标快速移动时的闪烁
-  setTimeout(() => {
-    topBarStore.popupVisible.userPanel = false
-  }, 100)
-}
 
 const { t } = useI18n()
 
@@ -158,8 +141,6 @@ function handleClickChannel() {
     shadow="[var(--bew-shadow-3),var(--bew-shadow-edge-glow-1)]"
     class="userPanel-pop bew-popover"
     data-key="userPanel"
-    @mouseenter="handleMouseEnter"
-    @mouseleave="handleMouseLeave"
   >
     <div
       text="xl" font-medium flex="~ items-center gap-2"

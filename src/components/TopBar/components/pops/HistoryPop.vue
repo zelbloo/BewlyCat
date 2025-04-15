@@ -8,7 +8,6 @@ import Loading from '~/components/Loading.vue'
 import Progress from '~/components/Progress.vue'
 import type { HistoryResult, List as HistoryItem } from '~/models/history/history'
 import { Business } from '~/models/history/history'
-import { useTopBarStore } from '~/stores/topBarStore'
 import api from '~/utils/api'
 import { calcCurrentTime } from '~/utils/dataFormatter'
 import { getCSRF, removeHttpFromUrl, scrollToTop } from '~/utils/main'
@@ -167,22 +166,6 @@ function getHistoryList(type: Business, view_at = 0 as number) {
     })
 }
 
-// 添加鼠标事件处理函数
-function handleMouseEnter() {
-  const topBarStore = useTopBarStore()
-  topBarStore.setMouseOverPopup('history', true)
-}
-
-function handleMouseLeave() {
-  const topBarStore = useTopBarStore()
-  topBarStore.setMouseOverPopup('history', false)
-
-  // 延迟关闭弹窗，避免鼠标快速移动时的闪烁
-  setTimeout(() => {
-    topBarStore.popupVisible.history = false
-  }, 100)
-}
-
 function deleteHistoryItem(index: number, historyItem: HistoryItem) {
   api.history.deleteHistoryItem({
     kid: `${historyItem.history.business}_${historyItem.history.oid}`,
@@ -208,8 +191,6 @@ function deleteHistoryItem(index: number, historyItem: HistoryItem) {
     border="1 $bew-border-color"
     class="history-pop bew-popover"
     data-key="history"
-    @mouseenter="handleMouseEnter"
-    @mouseleave="handleMouseLeave"
   >
     <!-- top bar -->
     <header

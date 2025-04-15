@@ -9,12 +9,12 @@ import { useTopBarInteraction } from '../composables/useTopBarInteraction'
 import BewlyOrBiliPageSwitcher from './BewlyOrBiliPageSwitcher.vue'
 import ChannelsPop from './pops/ChannelsPop.vue'
 
-const { handleClickTopBarItem, setupTopBarItems } = useTopBarInteraction()
+const { handleClickTopBarItem, setupTopBarItemHoverEvent } = useTopBarInteraction()
 const topBarStore = useTopBarStore()
 const { forceWhiteIcon, popupVisible } = storeToRefs(topBarStore)
 const logo = ref<HTMLElement | null>(null)
 
-const { channels } = setupTopBarItems()
+const channels = setupTopBarItemHoverEvent('channels')
 </script>
 
 <template>

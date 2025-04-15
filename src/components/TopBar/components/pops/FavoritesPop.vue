@@ -3,8 +3,6 @@ import type { Ref } from 'vue'
 
 import Empty from '~/components/Empty.vue'
 import Loading from '~/components/Loading.vue'
-// 添加鼠标事件处理
-import { useTopBarStore } from '~/stores/topBarStore'
 import api from '~/utils/api'
 import { calcCurrentTime } from '~/utils/dataFormatter'
 import { getUserID, removeHttpFromUrl, scrollToTop } from '~/utils/main'
@@ -133,23 +131,6 @@ function isMusic(item: FavoriteResource) {
   return item.link.includes('bilibili://music')
 }
 
-function handleMouseEnter() {
-  // 通知 TopBar 鼠标在弹窗上
-  const topBarStore = useTopBarStore()
-  topBarStore.setMouseOverPopup('favorites', true)
-}
-
-function handleMouseLeave() {
-  // 通知 TopBar 鼠标离开弹窗
-  const topBarStore = useTopBarStore()
-  topBarStore.setMouseOverPopup('favorites', false)
-
-  // 延迟关闭弹窗，避免鼠标快速移动时的闪烁
-  setTimeout(() => {
-    topBarStore.popupVisible.favorites = false
-  }, 100)
-}
-
 defineExpose({
   refreshFavoriteResources,
 })
@@ -166,8 +147,6 @@ defineExpose({
     shadow="[var(--bew-shadow-edge-glow-1),var(--bew-shadow-3)]"
     border="1 $bew-border-color"
     class="favorites-pop"
-    @mouseenter="handleMouseEnter"
-    @mouseleave="handleMouseLeave"
   >
     <!-- top bar -->
     <header

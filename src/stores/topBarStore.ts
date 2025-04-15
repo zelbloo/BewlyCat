@@ -1,4 +1,3 @@
-import { useWindowFocus } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 
@@ -7,7 +6,6 @@ import {
   BANGUMI_PLAY_URL,
   CHANNEL_PAGE_URL,
   CREATOR_PLATFORM_URL,
-  MESSAGE_URL,
   MOMENTS_URL,
   READ_HOME_URL,
   READ_PREVIEW_URL,
@@ -421,89 +419,12 @@ export const useTopBarStore = defineStore('topBar', () => {
     })
   }
 
-  function setupWatchers(toggleTopBarVisible: (visible: boolean) => void, favoritesTransformer: any) {
-    watch(() => settings.value?.autoHideTopBar ?? false, (newVal) => {
-      if (newVal === undefined)
-        return
-      if (!newVal)
-        toggleTopBarVisible(true)
-    })
-
-    // 通知相关监听
-    watch(
-      () => popupVisible.notifications ?? false,
-      (newVal, oldVal) => {
-        if (oldVal === undefined && MESSAGE_URL.test(location.href))
-          return
-
-        if (newVal === oldVal)
-          return
-
-        if (!newVal)
-          getUnreadMessageCount()
-      },
-      { immediate: true },
-    )
-
-    watch(
-      () => drawerVisible.notifications ?? false,
-      (newVal, oldVal) => {
-        if (newVal === oldVal)
-          return
-
-        if (!newVal)
-          getUnreadMessageCount()
-      },
-    )
-
-    const focused = useWindowFocus()
-    watch(() => focused.value, (newVal) => {
-      if (newVal && isLogin.value)
-        getUnreadMessageCount()
-    })
-
-    watch(
-      () => popupVisible.moments ?? false,
-      async (newVal, oldVal) => {
-        if (newVal === oldVal)
-          return
-
-        // 只在弹窗打开或关闭时更新
-        if (isLogin.value) {
-          if (newVal) {
-            // 弹窗打开时，如果没有内容则初始化
-            if (moments.length === 0)
-              await getTopBarMoments('video')
-          }
-          else {
-            // 弹窗关闭时更新计数
-            await getTopBarNewMomentsCount('video')
-          }
-        }
-      },
-      { immediate: true },
-    )
-
-    watch(() => popupVisible.favorites ?? false, (newVal, oldVal) => {
-      if (newVal === oldVal)
-        return
-      // 确保 favoritesTransformer 存在
-      if (newVal && favoritesTransformer) {
-        nextTick(() => {
-          if (favoritesTransformer?.value)
-            favoritesTransformer.value.refreshFavoriteResources()
-        })
-      }
-    })
-  }
-
   let updateTimer: ReturnType<typeof setInterval> | null = null
 
   function initData() {
     getUserInfo()
     getUnreadMessageCount()
     getTopBarNewMomentsCount()
-    // startUpdateTimer()
   }
 
   function startUpdateTimer() {
@@ -582,11 +503,9 @@ export const useTopBarStore = defineStore('topBar', () => {
     isMouseOverPopup,
     setMouseOverPopup,
     getMouseOverPopup,
-    setupWatchers,
     startUpdateTimer,
     stopUpdateTimer,
 
-    // 添加新的导出
     moments,
     addedWatchLaterList,
     isLoadingMoments,
@@ -595,7 +514,7 @@ export const useTopBarStore = defineStore('topBar', () => {
     momentUpdateBaseline,
     momentOffset,
 
-    // 添加新的方法导出
+    getTopBarMoments,
     initMomentsData,
     getMomentsData,
     isNewMoment,

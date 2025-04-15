@@ -106,24 +106,6 @@ function toggleWatchLater(aid: number) {
       })
   }
 }
-
-// 添加鼠标事件处理函数
-function handleMouseEnter() {
-  topBarStore.setMouseOverPopup('moments', true)
-}
-
-function handleMouseLeave() {
-  topBarStore.setMouseOverPopup('moments', false)
-
-  // 延迟关闭弹窗，避免鼠标快速移动时的闪烁
-  setTimeout(() => {
-    topBarStore.popupVisible.moments = false
-  }, 100)
-}
-
-// defineExpose({
-//   checkIfHasNewMomentsThenUpdateMoments,
-// })
 </script>
 
 <template>
@@ -139,8 +121,6 @@ function handleMouseLeave() {
     border="1 $bew-border-color"
     class="moments-pop bew-popover"
     data-key="moments"
-    @mouseenter="handleMouseEnter"
-    @mouseleave="handleMouseLeave"
   >
     <!-- top bar -->
     <header

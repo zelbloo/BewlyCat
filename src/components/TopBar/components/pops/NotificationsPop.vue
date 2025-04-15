@@ -2,7 +2,6 @@
 import { useI18n } from 'vue-i18n'
 
 import { settings } from '~/logic'
-import { useTopBarStore } from '~/stores/topBarStore'
 
 const props = defineProps<{
   // 接收外部传入的通知数据
@@ -13,22 +12,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'itemClick', item: { name: string, url: string, unreadCount: number, icon: string }): void
 }>()
-
-// 添加鼠标事件处理函数
-function handleMouseEnter() {
-  const topBarStore = useTopBarStore()
-  topBarStore.setMouseOverPopup('notifications', true)
-}
-
-function handleMouseLeave() {
-  const topBarStore = useTopBarStore()
-  topBarStore.setMouseOverPopup('notifications', false)
-
-  // 延迟关闭弹窗，避免鼠标快速移动时的闪烁
-  setTimeout(() => {
-    topBarStore.popupVisible.notifications = false
-  }, 100)
-}
 
 const { t } = useI18n()
 const list = computed((): { name: string, url: string, unreadCount: number, icon: string }[] => [
@@ -99,8 +82,6 @@ function handleClick(event: MouseEvent, item: { name: string, url: string, unrea
     flex="~ col"
     class="notifications-pop bew-popover"
     data-key="notifications"
-    @mouseenter="handleMouseEnter"
-    @mouseleave="handleMouseLeave"
   >
     <ALink
       v-for="item in list"

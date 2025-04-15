@@ -121,12 +121,3 @@ export interface TopBarItemElements {
 export interface TopBarTransformers {
   [key: string]: Ref<any>
 }
-
-export interface TopBarInteraction {
-  // popupVisible: PopupVisibleState
-  currentClickedTopBarItem: Ref<string | null>
-  handleClickTopBarItem: (event: MouseEvent, key: string) => void
-  setupTopBarItems: () => any
-  setupClickOutside: () => void
-  registerTopBarItem: (key: string, element: HTMLElement | null, transformer: any) => void
-}
