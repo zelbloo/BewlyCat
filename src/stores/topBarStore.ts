@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, nextTick, reactive, ref, watch } from 'vue'
+import { computed, reactive, ref } from 'vue'
 
 import {
   ACCOUNT_URL,
