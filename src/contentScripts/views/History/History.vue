@@ -66,7 +66,7 @@ function getHistoryList() {
           ? historyList[historyList.length - 1].view_at
           : 0,
   })
-    .then(async (res: HistoryResult) => {
+    .then((res: HistoryResult) => {
       if (res.code === 0) {
         if (Array.isArray(res.data.list) && res.data.list.length > 0)
           historyList.push(...res.data.list)
@@ -79,7 +79,7 @@ function getHistoryList() {
 
         noMoreContent.value = false
 
-        if (!await haveScrollbar() && !noMoreContent.value) {
+        if (!haveScrollbar() && !noMoreContent.value) {
           getHistoryList()
         }
       }
