@@ -171,6 +171,10 @@ window.addEventListener(BEWLY_MOUNTED, () => {
   }
 })
 
+// 监听URL变化，用于处理SPA页面导航
+let lastUrl = location.href
+let stopUrlChangeDetection = false
+
 // 判断是否为视频页面
 function isVideoPage() {
   return location.pathname.startsWith('/video/')
@@ -181,52 +185,75 @@ function isBangumiOrWatchLaterPage() {
   return location.pathname.startsWith('/bangumi/play/') || location.pathname.startsWith('/list/watchlater')
 }
 
+let playerModeApplied = false
+
 // 应用默认播放器模式
 function applyDefaultPlayerMode() {
+  if (playerModeApplied)
+    return
+
   const playerMode = settings.value.defaultVideoPlayerMode
   if (!playerMode || playerMode === 'default') {
     // 默认模式也需要居中显示
     defaultMode()
-    return
+  }
+  else {
+    switch (playerMode) {
+      case 'fullscreen':
+        fullscreen()
+        break
+      case 'webFullscreen':
+        webFullscreen()
+        break
+      case 'widescreen':
+        widescreen()
+        break
+    }
   }
 
-  switch (playerMode) {
-    case 'fullscreen':
-      fullscreen()
-      break
-    case 'webFullscreen':
-      webFullscreen()
-      break
-    case 'widescreen':
-      widescreen()
-      break
-  }
+  // 标记已应用播放器模式
+  playerModeApplied = true
+
+  // 应用后移除不必要的事件监听
+  window.removeEventListener('visibilitychange', handleVisibilityChange)
+
+  // 停止URL变化检测
+  stopUrlChangeDetection = true
 }
 
-// 监听URL变化，用于处理SPA页面导航
-let lastUrl = location.href
 function checkForUrlChanges() {
-  if (location.href !== lastUrl) {
+  if (!stopUrlChangeDetection && location.href !== lastUrl) {
     lastUrl = location.href
+    // 重置标志，允许在新页面应用播放器模式
+    playerModeApplied = false
+
     if (isVideoPage() || isBangumiOrWatchLaterPage()) {
       // 当URL变化且是视频或番剧页面时，应用默认播放器模式
       applyDefaultPlayerMode()
     }
   }
-  requestAnimationFrame(checkForUrlChanges)
+
+  if (!stopUrlChangeDetection) {
+    requestAnimationFrame(checkForUrlChanges)
+  }
 }
 requestAnimationFrame(checkForUrlChanges)
 
 // 处理页面可见性变化
 function handleVisibilityChange() {
-  // 当页面变为可见且是视频或番剧页面时
-  if (document.visibilityState === 'visible' && (isVideoPage() || isBangumiOrWatchLaterPage())) {
+  // 当页面变为可见且是视频或番剧页面时，且尚未应用播放器模式
+  if (document.visibilityState === 'visible'
+    && (isVideoPage() || isBangumiOrWatchLaterPage())
+    && !playerModeApplied) {
     applyDefaultPlayerMode()
   }
 }
 
 // 添加页面加载和可见性变化的监听
 window.addEventListener('load', () => {
+  // 重置标志，允许在新页面加载时应用播放器模式
+  playerModeApplied = false
+
   if (isVideoPage()) {
     applyDefaultPlayerMode()
     disableAutoPlayCollection(settings.value)
@@ -266,6 +293,9 @@ function setupBiliVideoCardClickHandler() {
   }, true)
 }
 window.addEventListener('pageshow', () => {
+  // 重置标志，允许在页面显示时应用播放器模式
+  playerModeApplied = false
+
   if (isVideoPage() || isBangumiOrWatchLaterPage()) {
     applyDefaultPlayerMode()
   }
