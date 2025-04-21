@@ -178,7 +178,7 @@ function isVideoPage() {
 
 // 判断是否为番剧/watchlater页面
 function isBangumiOrWatchLaterPage() {
-  return location.pathname.startsWith('/bangumi/play/') || location.pathname.startsWith('/list/watchlater/')
+  return location.pathname.startsWith('/bangumi/play/') || location.pathname.startsWith('/list/watchlater')
 }
 
 // 应用默认播放器模式
