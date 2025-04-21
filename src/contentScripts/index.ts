@@ -164,7 +164,7 @@ if (settings.value.adaptToOtherPageStyles && isHomePage()) {
 window.addEventListener(BEWLY_MOUNTED, () => {
   if (beforeLoadedStyleEl) {
     document.documentElement.removeChild(beforeLoadedStyleEl)
-    if (location.pathname.startsWith('/video/')) {
+    if (isVideoPage()) {
       // 根据设置应用默认播放器模式
       applyDefaultPlayerMode()
     }
@@ -176,9 +176,9 @@ function isVideoPage() {
   return location.pathname.startsWith('/video/')
 }
 
-// 判断是否为番剧页面
-function isBangumiPage() {
-  return location.pathname.startsWith('/bangumi/play/')
+// 判断是否为番剧/watchlater页面
+function isBangumiOrWatchLaterPage() {
+  return location.pathname.startsWith('/bangumi/play/') || location.pathname.startsWith('/list/watchlater/')
 }
 
 // 应用默认播放器模式
@@ -208,7 +208,7 @@ let lastUrl = location.href
 function checkForUrlChanges() {
   if (location.href !== lastUrl) {
     lastUrl = location.href
-    if (isVideoPage() || isBangumiPage()) {
+    if (isVideoPage() || isBangumiOrWatchLaterPage()) {
       // 当URL变化且是视频或番剧页面时，应用默认播放器模式
       applyDefaultPlayerMode()
     }
@@ -220,7 +220,7 @@ requestAnimationFrame(checkForUrlChanges)
 // 处理页面可见性变化
 function handleVisibilityChange() {
   // 当页面变为可见且是视频或番剧页面时
-  if (document.visibilityState === 'visible' && (isVideoPage() || isBangumiPage())) {
+  if (document.visibilityState === 'visible' && (isVideoPage() || isBangumiOrWatchLaterPage())) {
     applyDefaultPlayerMode()
   }
 }
@@ -231,7 +231,7 @@ window.addEventListener('load', () => {
     applyDefaultPlayerMode()
     disableAutoPlayCollection(settings.value)
   }
-  else if (isBangumiPage()) {
+  else if (isBangumiOrWatchLaterPage()) {
     applyDefaultPlayerMode()
     // 番剧页面不执行 disableAutoPlayCollection
   }
@@ -266,7 +266,7 @@ function setupBiliVideoCardClickHandler() {
   }, true)
 }
 window.addEventListener('pageshow', () => {
-  if (isVideoPage() || isBangumiPage()) {
+  if (isVideoPage() || isBangumiOrWatchLaterPage()) {
     applyDefaultPlayerMode()
   }
 })
@@ -338,17 +338,8 @@ function injectAppWhenIdle() {
 }
 
 function injectApp() {
-  // Remove bewly element if it already exists and the version is less than the current version
-  // Only the development mode bewly element remains
   const bewlyElArr: NodeListOf<Element> = document.querySelectorAll('#bewly')
   if (bewlyElArr.length > 0) {
-    // alert(`
-    //   You have multiple versions of BewlyBewly installed. Please retain only one to avoid conflicts and issues!
-    //   您安装了多个版本的 BewlyBewly。请只保留一个版本以避免冲突和问题！
-    //   您安裝了多個版本的 BewlyBewly。請只保留一個版本以避免衝突和問題！
-    //   你單咗幾個版本嘅 BewlyBewly。請淨係留一個版本嚟避免衝突同問題！
-    // `)
-
     bewlyElArr.forEach((el: Element) => {
       const elVersion = el.getAttribute('data-version') || '0.0.0'
       const elIsDev = el.getAttribute('data-dev') === 'true'
