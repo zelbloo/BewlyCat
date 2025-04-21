@@ -64,7 +64,7 @@ const uploadTransformer = setupTopBarItemTransformer('upload')
 const moreTransformer = setupTopBarItemTransformer('more')
 
 watch(
-  () => popupVisible.value.notifications,
+  () => popupVisible.value?.notifications ?? false,
   (newVal, oldVal) => {
     if (newVal === undefined || oldVal === undefined)
       return
@@ -82,7 +82,7 @@ watch(
 )
 
 watch(
-  () => drawerVisible.value.notifications ?? false,
+  () => drawerVisible.value?.notifications ?? false,
   (newVal, oldVal) => {
     if (newVal === oldVal)
       return
@@ -99,7 +99,7 @@ watch(() => focused.value, (newVal) => {
 })
 
 watch(
-  () => popupVisible.value.moments,
+  () => popupVisible.value?.moments ?? false,
   async (newVal, oldVal) => {
     if (newVal === undefined || oldVal === undefined)
       return
@@ -117,20 +117,24 @@ watch(
   { immediate: true },
 )
 
-watch(() => popupVisible.value.favorites ?? false, (newVal, oldVal) => {
-  if (newVal === undefined || oldVal === undefined)
-    return
+watch(
+  () => popupVisible.value?.favorites ?? false,
+  (newVal, oldVal) => {
+    if (newVal === undefined || oldVal === undefined)
+      return
 
-  if (newVal === oldVal)
-    return
+    if (newVal === oldVal)
+      return
 
-  if (newVal && favoritesTransformer.value) {
-    nextTick(() => {
-      if (favoritesTransformer.value)
-        (favoritesTransformer.value as any).refreshFavoriteResources?.()
-    })
-  }
-}, { immediate: true })
+    if (newVal && favoritesTransformer.value) {
+      nextTick(() => {
+        if (favoritesTransformer.value)
+          (favoritesTransformer.value as any).refreshFavoriteResources?.()
+      })
+    }
+  },
+  { immediate: true },
+)
 
 // 修改通知点击处理
 function handleNotificationsClick(item: { name: string, url: string, unreadCount: number, icon: string }) {

@@ -228,15 +228,13 @@ export const useTopBarStore = defineStore('topBar', () => {
       if (res.code === 0) {
         const { update_num, update_baseline, items, has_more } = res.data
 
-        // 更新计数
         newMomentsCount.value = update_num
 
-        // 如果有更新内容且不是在弹窗中，则更新基准线
         if (update_baseline && !popupVisible.moments)
           momentUpdateBaseline.value = update_baseline
 
-        // 如果弹窗打开且有新内容，则添加到列表顶部
-        if (popupVisible.moments && update_num > 0 && items?.length) {
+        // 有新内容，则添加到列表顶部
+        if (update_num > 0 && items?.length) {
           for (let i = update_num - 1; i >= 0; i--) {
             moments.unshift({
               type: selectedType,
@@ -284,8 +282,6 @@ export const useTopBarStore = defineStore('topBar', () => {
     else
       getTopBarLiveMoments()
   }
-
-  // 移除 checkIfHasNewMomentsThenUpdateMoments 函数，合并到 getTopBarNewMomentsCount
 
   function getTopBarMoments(selectedType: string) {
     if (isLoadingMoments.value || noMoreMomentsContent.value)

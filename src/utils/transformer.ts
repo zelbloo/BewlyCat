@@ -1,5 +1,5 @@
 import type { MaybeElement } from '@vueuse/core'
-import { unrefElement, useElementVisibility } from '@vueuse/core'
+import { unrefElement, useElementVisibility, whenever } from '@vueuse/core'
 import type { CSSProperties } from 'vue'
 
 interface TransformerCenter {
@@ -23,13 +23,23 @@ export function createTransformer(trigger: Ref<MaybeElement>, transformer: Trans
   const target = ref<MaybeElement>()
   const style = ref<CSSProperties>({})
 
-  watch(trigger, () => {
-    if (transformer.notrigger) {
-      target.value = unrefElement(trigger)
+  whenever(trigger, (newVal) => {
+    if (transformer.notrigger && newVal) {
+      try {
+        target.value = unrefElement(trigger)
+      }
+      catch (e) {
+        console.warn('Failed to unref element in transformer:', e)
+      }
     }
-  }, { immediate: true })
+  })
 
   function update() {
+    // 添加安全检查
+    if (!target.value && !unrefElement(trigger)) {
+      return
+    }
+
     let x = '0px'
     let y = '0px'
 
@@ -47,16 +57,19 @@ export function createTransformer(trigger: Ref<MaybeElement>, transformer: Trans
       y = transformer.y
     }
 
+    // 增加安全检查
     if (target.value && transformer.centerTarget) {
       const el = unrefElement(target.value)
-      const targetRect = el!.getBoundingClientRect()
+      if (el) {
+        const targetRect = el.getBoundingClientRect()
 
-      if (transformer.centerTarget.x) {
-        x = `calc(${transformer.x} - ${targetRect.width / 2}px)`
-      }
+        if (transformer.centerTarget.x) {
+          x = `calc(${transformer.x} - ${targetRect.width / 2}px)`
+        }
 
-      if (transformer.centerTarget.y) {
-        y = `calc(${transformer.y} - ${targetRect.height / 2}px)`
+        if (transformer.centerTarget.y) {
+          y = `calc(${transformer.y} - ${targetRect.height / 2}px)`
+        }
       }
     }
 
@@ -65,11 +78,6 @@ export function createTransformer(trigger: Ref<MaybeElement>, transformer: Trans
       top: y,
       left: x,
     }
-
-    //   // nothing, use inherit transform
-    //   style.value = {
-    //     transform: `translate3d(${x}, ${y}, 0) !important`,
-    //   }
   }
 
   function generateStyle(originStyle: string | undefined | null): string {
@@ -101,9 +109,19 @@ export function createTransformer(trigger: Ref<MaybeElement>, transformer: Trans
   }
 
   // v-show
-  const targetVisibility = useElementVisibility(() => unrefElement(target))
-  watch(targetVisibility, (visible) => {
-    if (visible) {
+  const targetVisibility = useElementVisibility(() => {
+    try {
+      return unrefElement(target)
+    }
+    catch (e) {
+      console.warn('Failed to get element visibility:', e)
+      return null
+    }
+  })
+
+  // 使用 whenever 替代 watch
+  whenever(targetVisibility, () => {
+    try {
       const targetElement = unrefElement(target)
       if (targetElement) {
         update()
@@ -111,22 +129,21 @@ export function createTransformer(trigger: Ref<MaybeElement>, transformer: Trans
         targetElement.setAttribute('style', generateStyle(style))
       }
     }
+    catch (e) {
+      console.warn('Failed to update style on visibility change:', e)
+    }
   }, { flush: 'pre' })
 
-  // v-show
-  // useEventListener(() => unrefElement(target), 'transitionstart', () => {
-  //   update()
-  //   const style = unrefElement(target)?.getAttribute('style')
-  //   unrefElement(target)?.setAttribute('style', generateStyle(style))
-  // })
-
-  // useEventListener(() => unrefElement(target), 'transitionend', () => {
-  //   const style = unrefElement(target)?.getAttribute('style')
-  //   unrefElement(target)?.setAttribute('style', generateStyle(style))
-  // })
-
   // v-if
-  watch(() => unrefElement(target), (targetElement) => {
+  whenever(() => {
+    try {
+      return unrefElement(target)
+    }
+    catch (e) {
+      console.warn('Failed to watch target element:', e)
+      return null
+    }
+  }, (targetElement) => {
     if (targetElement) {
       update()
       const style = targetElement.getAttribute('style')
