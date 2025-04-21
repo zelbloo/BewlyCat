@@ -378,7 +378,7 @@ async function getRecommendVideos() {
 
     if (!needToLoginFirst.value) {
       await nextTick()
-      if (!await haveScrollbar() || filledItems.length < PAGE_SIZE || filledItems.length < 1) {
+      if (!haveScrollbar() || filledItems.length < PAGE_SIZE || filledItems.length < 1) {
         // 检查请求次数和频率限制
         if (requestCount.value < maxRequestsPerSession && (Date.now() - lastRequestTime.value >= requestThrottleTime)) {
           getRecommendVideos()
@@ -463,7 +463,7 @@ async function getAppRecommendVideos() {
 
     if (!needToLoginFirst.value) {
       await nextTick()
-      if (!await haveScrollbar() || filledItems.length < PAGE_SIZE || filledItems.length < 1) {
+      if (!haveScrollbar() || filledItems.length < PAGE_SIZE || filledItems.length < 1) {
         // 检查请求次数和频率限制
         if (requestCount.value < maxRequestsPerSession && (Date.now() - lastRequestTime.value >= requestThrottleTime)) {
           getAppRecommendVideos()

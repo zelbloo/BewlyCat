@@ -221,9 +221,9 @@ function handleDockItemClick(dockItem: DockItem) {
     }
     else {
       if (isHomePage()) {
-        nextTick(() => {
+        setTimeout(() => {
           changeActivatePage(dockItem.page)
-        })
+        }, 200)
       }
       else {
         location.href = `https://www.bilibili.com/?page=${dockItem.page}`

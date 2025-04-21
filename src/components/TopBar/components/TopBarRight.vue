@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useWindowFocus } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 
@@ -8,6 +9,7 @@ import { useTopBarStore } from '~/stores/topBarStore'
 import { getUserID } from '~/utils/main'
 
 import { useTopBarInteraction } from '../composables/useTopBarInteraction'
+import { MESSAGE_URL } from '../constants/urls'
 import FavoritesPop from './pops/FavoritesPop.vue'
 import HistoryPop from './pops/HistoryPop.vue'
 import MomentsPop from './pops/MomentsPop.vue'
@@ -33,32 +35,106 @@ const {
   unReadMessageCount,
 } = storeToRefs(topBarStore)
 
+const { getUnreadMessageCount, getTopBarNewMomentsCount } = topBarStore
+
 // 将 DOM 引用移到组件内部
 const avatarImg = ref<HTMLElement | null>(null)
 const avatarShadow = ref<HTMLElement | null>(null)
 
-const { handleClickTopBarItem, setupTopBarItems } = useTopBarInteraction()
+const { handleClickTopBarItem, setupTopBarItemHoverEvent, setupTopBarItemTransformer } = useTopBarInteraction()
 
 const mid = getUserID() || ''
 
-const {
-  moments,
-  favorites,
-  history,
-  watchLater,
-  upload,
-  notifications,
-  more,
-  avatar,
-  momentsTransformer,
-  favoritesTransformer,
-  watchLaterTransformer,
-  historyTransformer,
-  uploadTransformer,
-  notificationsTransformer,
-  moreTransformer,
-  avatarTransformer,
-} = setupTopBarItems()
+const moments = setupTopBarItemHoverEvent('moments')
+const favorites = setupTopBarItemHoverEvent('favorites')
+const history = setupTopBarItemHoverEvent('history')
+const watchLater = setupTopBarItemHoverEvent('watchLater')
+const upload = setupTopBarItemHoverEvent('upload')
+const notifications = setupTopBarItemHoverEvent('notifications')
+const more = setupTopBarItemHoverEvent('more')
+const avatar = setupTopBarItemHoverEvent('userPanel')
+
+const avatarTransformer = setupTopBarItemTransformer('userPanel')
+const notificationsTransformer = setupTopBarItemTransformer('notifications')
+const momentsTransformer = setupTopBarItemTransformer('moments')
+const favoritesTransformer = setupTopBarItemTransformer('favorites')
+const historyTransformer = setupTopBarItemTransformer('history')
+const watchLaterTransformer = setupTopBarItemTransformer('watchLater')
+const uploadTransformer = setupTopBarItemTransformer('upload')
+const moreTransformer = setupTopBarItemTransformer('more')
+
+watch(
+  () => popupVisible.value?.notifications ?? false,
+  (newVal, oldVal) => {
+    if (newVal === undefined || oldVal === undefined)
+      return
+
+    if (oldVal !== undefined && MESSAGE_URL.test(location.href))
+      return
+
+    if (newVal === oldVal)
+      return
+
+    if (!newVal)
+      getUnreadMessageCount()
+  },
+  { immediate: true },
+)
+
+watch(
+  () => drawerVisible.value?.notifications ?? false,
+  (newVal, oldVal) => {
+    if (newVal === oldVal)
+      return
+
+    if (!newVal)
+      getUnreadMessageCount()
+  },
+)
+
+const focused = useWindowFocus()
+watch(() => focused.value, (newVal) => {
+  if (newVal && isLogin.value)
+    getUnreadMessageCount()
+})
+
+watch(
+  () => popupVisible.value?.moments ?? false,
+  async (newVal, oldVal) => {
+    if (newVal === undefined || oldVal === undefined)
+      return
+
+    if (newVal === oldVal)
+      return
+
+    // 弹窗关闭时更新
+    if (isLogin.value) {
+      if (!newVal) {
+        await getTopBarNewMomentsCount('video')
+      }
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  () => popupVisible.value?.favorites ?? false,
+  (newVal, oldVal) => {
+    if (newVal === undefined || oldVal === undefined)
+      return
+
+    if (newVal === oldVal)
+      return
+
+    if (newVal && favoritesTransformer.value) {
+      nextTick(() => {
+        if (favoritesTransformer.value)
+          (favoritesTransformer.value as any).refreshFavoriteResources?.()
+      })
+    }
+  },
+  { immediate: true },
+)
 
 // 修改通知点击处理
 function handleNotificationsClick(item: { name: string, url: string, unreadCount: number, icon: string }) {
@@ -388,53 +464,4 @@ function handleNotificationsClick(item: { name: string, url: string, unreadCount
 
 <style lang="scss" scoped>
 @import "../styles/index.scss";
-
-// 添加弹窗定位样式
-.right-side-item {
-  position: relative;
-}
-
-.bew-popover {
-  position: absolute;
-  top: 46px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 999;
-}
-
-// 用户面板弹窗特殊处理
-.avatar {
-  position: relative;
-  z-index: 1000; // 确保头像在弹出层之上
-
-  &.hover {
-    z-index: 1000; // 悬停时保持高层级
-  }
-
-  .avatar-img {
-    position: relative;
-    z-index: 1001; // 提高头像图片层级，确保在所有效果之上
-    isolation: isolate; // 创建新的层叠上下文
-
-    &.hover {
-      z-index: 1001; // 悬停时保持高层级
-    }
-  }
-
-  .avatar-shadow {
-    position: relative;
-    z-index: 999; // 阴影应该在图片下方
-  }
-
-  .vip-img {
-    z-index: 1002 !important; // VIP图标应该在最上层
-  }
-
-  .bew-popover {
-    left: auto;
-    right: 0;
-    transform: translateX(0);
-    z-index: 998; // 确保弹出层在头像下方
-  }
-}
 </style>

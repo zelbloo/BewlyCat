@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onKeyStroke, useMouseInElement } from '@vueuse/core'
-import { nextTick, onMounted, onUnmounted, provide, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 
 import { useBewlyApp } from '~/composables/useAppProvider'
 import { useDark } from '~/composables/useDark'
@@ -12,19 +12,12 @@ import emitter from '~/utils/mitt'
 
 import NotificationsDrawer from './components/NotificationsDrawer.vue'
 import TopBarHeader from './components/TopBarHeader.vue'
-import { useTopBarInteraction } from './composables/useTopBarInteraction'
-import type { TopBarInteraction } from './types'
 
 const { scrollbarRef, reachTop } = useBewlyApp()
 // 顶栏状态管理
 const topBarStore = useTopBarStore()
 
 const { isDark } = useDark()
-
-// 顶栏交互逻辑 - 确保正确初始化并提供给子组件
-const topBarInteraction = useTopBarInteraction()
-// // 显式提供 TopBarInteraction 类型
-provide<TopBarInteraction>('topBarInteraction', topBarInteraction)
 
 // 顶栏显示控制
 const hideTopBar = ref<boolean>(false)
@@ -85,18 +78,7 @@ onMounted(() => {
   nextTick(() => {
     // 先初始化数据
     topBarStore.initData()
-    topBarInteraction.setupClickOutside()
-
-    // 启动定时器
     topBarStore.startUpdateTimer()
-
-    // 确保 setupTopBarItems 返回值存在再传递给 setupWatchers
-    const items = topBarInteraction.setupTopBarItems()
-    topBarStore.setupWatchers(
-      toggleTopBarVisible,
-      items?.favoritesTransformer || { value: null },
-    )
-
     setupScrollListeners()
   })
 })

@@ -1,25 +1,7 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
 
-import { useTopBarStore } from '~/stores/topBarStore'
-
 const { t } = useI18n()
-
-// 添加鼠标事件处理函数
-function handleMouseEnter() {
-  const topBarStore = useTopBarStore()
-  topBarStore.setMouseOverPopup('upload', true)
-}
-
-function handleMouseLeave() {
-  const topBarStore = useTopBarStore()
-  topBarStore.setMouseOverPopup('upload', false)
-
-  // 延迟关闭弹窗，避免鼠标快速移动时的闪烁
-  setTimeout(() => {
-    topBarStore.popupVisible.upload = false
-  }, 100)
-}
 
 const list = computed(() => {
   return [
@@ -64,8 +46,6 @@ const list = computed(() => {
     flex="~ col"
     class="upload-pop bew-popover"
     data-key="upload"
-    @mouseenter="handleMouseEnter"
-    @mouseleave="handleMouseLeave"
   >
     <a
       v-for="(item, index) in list"

@@ -44,6 +44,7 @@ export default antfu(
       'sort-imports': 'off',
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
+      'no-console': ['error', { allow: ['debug', 'warn', 'error', 'log'] }],
     },
   },
 )

@@ -5,7 +5,6 @@ import { setupTabMsgLstnrs } from './messageListeners/tabs'
 
 // Initialize extension and set up message handlers
 browser.runtime.onInstalled.addListener(async () => {
-  // eslint-disable-next-line no-console
   console.log('Extension installed')
 })
 

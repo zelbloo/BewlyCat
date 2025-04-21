@@ -237,7 +237,7 @@ settings:
     <kbd>Enter</kbd> 键添加新的筛选条件或确认修改。 按 <kbd>Esc</kbd> 键取消修改。 双击列以编辑当前列。
   filter_by_user_table:
     username_or_mid: 用户名 / MID
-  filter_like_view_ratio: 按点赞播放比例筛选
+  filter_like_view_ratio: 按点赞播放比例筛选（仅在Web推荐模式下有效）
   filter_like_view_ratio_desc: 筛选视频的点赞数与播放数比例（默认为5%，最高为10%）
   following_tab_show_livestreaming_videos: 在 “正在关注” 中显示直播视频
   use_search_page_mode: 首页使用搜索页模式

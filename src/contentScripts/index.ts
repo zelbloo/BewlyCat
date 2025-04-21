@@ -164,21 +164,23 @@ if (settings.value.adaptToOtherPageStyles && isHomePage()) {
 window.addEventListener(BEWLY_MOUNTED, () => {
   if (beforeLoadedStyleEl) {
     document.documentElement.removeChild(beforeLoadedStyleEl)
-    if (location.pathname.startsWith('/video/')) {
+    if (isVideoPage()) {
       // 根据设置应用默认播放器模式
       applyDefaultPlayerMode()
     }
   }
 })
 
+let lastUrl = location.href
+
 // 判断是否为视频页面
 function isVideoPage() {
   return location.pathname.startsWith('/video/')
 }
 
-// 判断是否为番剧页面
-function isBangumiPage() {
-  return location.pathname.startsWith('/bangumi/play/')
+// 判断是否为番剧/watchlater页面
+function isBangumiOrWatchLaterPage() {
+  return location.pathname.startsWith('/bangumi/play/') || location.pathname.startsWith('/list/watchlater')
 }
 
 // 应用默认播放器模式
@@ -189,7 +191,6 @@ function applyDefaultPlayerMode() {
     defaultMode()
     return
   }
-
   switch (playerMode) {
     case 'fullscreen':
       fullscreen()
@@ -203,13 +204,10 @@ function applyDefaultPlayerMode() {
   }
 }
 
-// 监听URL变化，用于处理SPA页面导航
-let lastUrl = location.href
 function checkForUrlChanges() {
   if (location.href !== lastUrl) {
     lastUrl = location.href
-    if (isVideoPage() || isBangumiPage()) {
-      // 当URL变化且是视频或番剧页面时，应用默认播放器模式
+    if (isVideoPage() || isBangumiOrWatchLaterPage()) {
       applyDefaultPlayerMode()
     }
   }
@@ -219,8 +217,9 @@ requestAnimationFrame(checkForUrlChanges)
 
 // 处理页面可见性变化
 function handleVisibilityChange() {
-  // 当页面变为可见且是视频或番剧页面时
-  if (document.visibilityState === 'visible' && (isVideoPage() || isBangumiPage())) {
+  // 当页面变为可见且是视频或番剧页面时，且尚未应用播放器模式
+  if (document.visibilityState === 'visible'
+    && (isVideoPage() || isBangumiOrWatchLaterPage())) {
     applyDefaultPlayerMode()
   }
 }
@@ -231,7 +230,7 @@ window.addEventListener('load', () => {
     applyDefaultPlayerMode()
     disableAutoPlayCollection(settings.value)
   }
-  else if (isBangumiPage()) {
+  else if (isBangumiOrWatchLaterPage()) {
     applyDefaultPlayerMode()
     // 番剧页面不执行 disableAutoPlayCollection
   }
@@ -266,7 +265,7 @@ function setupBiliVideoCardClickHandler() {
   }, true)
 }
 window.addEventListener('pageshow', () => {
-  if (isVideoPage() || isBangumiPage()) {
+  if (isVideoPage() || isBangumiOrWatchLaterPage()) {
     applyDefaultPlayerMode()
   }
 })
@@ -338,17 +337,8 @@ function injectAppWhenIdle() {
 }
 
 function injectApp() {
-  // Remove bewly element if it already exists and the version is less than the current version
-  // Only the development mode bewly element remains
   const bewlyElArr: NodeListOf<Element> = document.querySelectorAll('#bewly')
   if (bewlyElArr.length > 0) {
-    // alert(`
-    //   You have multiple versions of BewlyBewly installed. Please retain only one to avoid conflicts and issues!
-    //   您安装了多个版本的 BewlyBewly。请只保留一个版本以避免冲突和问题！
-    //   您安裝了多個版本的 BewlyBewly。請只保留一個版本以避免衝突和問題！
-    //   你單咗幾個版本嘅 BewlyBewly。請淨係留一個版本嚟避免衝突同問題！
-    // `)
-
     bewlyElArr.forEach((el: Element) => {
       const elVersion = el.getAttribute('data-version') || '0.0.0'
       const elIsDev = el.getAttribute('data-dev') === 'true'
@@ -401,99 +391,3 @@ function injectApp() {
   setupApp(app)
   app.mount(root)
 }
-
-// 實際使用實在太卡，註釋了先
-// function startShadowDOMStyleInjection() {
-//   if (isHomePage() || !isSupportedPages())
-//     return
-
-//   const styleCache = new WeakSet() // Track which shadow roots have been processed
-
-//   function injectStyleToShadowDOM(shadowRoot: ShadowRoot) {
-//     if (styleCache.has(shadowRoot))
-//       return
-
-//     const styleEl = document.createElement('style')
-//     styleEl.setAttribute('data-bewly-style', 'true')
-//     styleEl.textContent = `
-//       @import url(${browser.runtime.getURL('dist/contentScripts/style.css')});
-//       ${settings.value.adaptToOtherPageStyles
-//       ? `
-//         * {
-//           --bew-theme-color: ${settings.value.themeColor};
-//           --bew-theme-color-10: color-mix(in oklab, var(--bew-theme-color), transparent 90%);
-//           --bew-theme-color-20: color-mix(in oklab, var(--bew-theme-color), transparent 80%);
-//           --bew-theme-color-30: color-mix(in oklab, var(--bew-theme-color), transparent 70%);
-//           --bew-theme-color-40: color-mix(in oklab, var(--bew-theme-color), transparent 60%);
-//           --bew-theme-color-50: color-mix(in oklab, var(--bew-theme-color), transparent 50%);
-//           --bew-theme-color-60: color-mix(in oklab, var(--bew-theme-color), transparent 40%);
-//           --bew-theme-color-70: color-mix(in oklab, var(--bew-theme-color), transparent 30%);
-//           --bew-theme-color-80: color-mix(in oklab, var(--bew-theme-color), transparent 20%);
-//           --bew-theme-color-90: color-mix(in oklab, var(--bew-theme-color), transparent 10%);
-//         }
-//       `
-//       : ''}
-//     `
-//     shadowRoot.appendChild(styleEl)
-//     styleCache.add(shadowRoot)
-//   }
-
-//   function processShadowDOM(node: HTMLElement) {
-//     if (node.shadowRoot) {
-//       injectStyleToShadowDOM(node.shadowRoot)
-//       observeShadowRoot(node.shadowRoot)
-//     }
-
-//     // Process child elements with shadow roots
-//     node.querySelectorAll('*').forEach((el) => {
-//       if (el instanceof HTMLElement && el.shadowRoot) {
-//         injectStyleToShadowDOM(el.shadowRoot)
-//         observeShadowRoot(el.shadowRoot)
-//       }
-//     })
-//   }
-
-//   function observeShadowRoot(shadowRoot: ShadowRoot) {
-//     const observer = new MutationObserver((mutations) => {
-//       mutations.forEach((mutation) => {
-//         if (mutation.type === 'childList') {
-//           mutation.addedNodes.forEach((node) => {
-//             if (node instanceof HTMLElement)
-//               processShadowDOM(node)
-//           })
-//         }
-//       })
-//     })
-
-//     observer.observe(shadowRoot, {
-//       childList: true,
-//       subtree: true,
-//     })
-//   }
-
-//   // Initial setup
-//   const rootObserver = new MutationObserver((mutations) => {
-//     mutations.forEach((mutation) => {
-//       if (mutation.type === 'childList') {
-//         mutation.addedNodes.forEach((node) => {
-//           if (node instanceof HTMLElement)
-//             processShadowDOM(node)
-//         })
-//       }
-//     })
-//   })
-
-//   // Start observing document body
-//   rootObserver.observe(document.body, {
-//     childList: true,
-//     subtree: true,
-//   })
-
-//   // Process existing shadow DOMs
-//   document.querySelectorAll('*').forEach((el) => {
-//     if (el instanceof HTMLElement && el.shadowRoot) {
-//       injectStyleToShadowDOM(el.shadowRoot)
-//       observeShadowRoot(el.shadowRoot)
-//     }
-//   })
-// }
