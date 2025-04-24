@@ -102,12 +102,12 @@ const selectedDislikeReason = ref<number>(1)
 
 // 修改缓存数据变量，添加前进状态变量
 const cachedVideoList = ref<VideoElement[]>([])
-const cachedAppVideoList = ref<AppVideoElement[]>([])
+// const cachedAppVideoList = ref<AppVideoElement[]>([])
 const cachedRefreshIdx = ref<number>(1)
 
 // 添加前进状态变量
 const forwardVideoList = ref<VideoElement[]>([])
-const forwardAppVideoList = ref<AppVideoElement[]>([])
+// const forwardAppVideoList = ref<AppVideoElement[]>([])
 const forwardRefreshIdx = ref<number>(1)
 
 // 添加状态标记
@@ -148,6 +148,17 @@ onKeyStroke((e: KeyboardEvent) => {
 })
 
 watch(() => settings.value.recommendationMode, () => {
+  noMoreContent.value = false
+  refreshIdx.value = 1
+
+  videoList.value = []
+  forwardVideoList.value = []
+  cachedVideoList.value = []
+
+  // 重置前进后退状态
+  hasBackState.value = false
+  hasForwardState.value = false
+  showUndoButton.value = false
   initData()
 })
 
@@ -236,73 +247,73 @@ function initPageAction() {
     if (isLoading.value)
       return
 
-    // 如果当前已经是后退状态，则保存当前数据到前进状态
-    if (hasBackState.value) {
-      forwardVideoList.value = JSON.parse(JSON.stringify(videoList.value))
-      forwardAppVideoList.value = JSON.parse(JSON.stringify(appVideoList.value))
-      forwardRefreshIdx.value = refreshIdx.value
-      hasForwardState.value = true
-    }
-    else {
-      // 保存当前数据到后退缓存
-      cachedVideoList.value = JSON.parse(JSON.stringify(videoList.value))
-      cachedAppVideoList.value = JSON.parse(JSON.stringify(appVideoList.value))
-      cachedRefreshIdx.value = refreshIdx.value
-      hasBackState.value = true
+    // 根据当前模式保存数据
+    if (settings.value.recommendationMode === 'web') {
+      if (hasBackState.value) {
+        // 如果当前已经是后退状态，则保存当前数据到前进状态
+        forwardVideoList.value = JSON.parse(JSON.stringify(videoList.value))
+        forwardRefreshIdx.value = refreshIdx.value
+        hasForwardState.value = true
+      }
+      else {
+        // 保存当前数据到后退缓存
+        cachedVideoList.value = JSON.parse(JSON.stringify(videoList.value))
+        cachedRefreshIdx.value = refreshIdx.value
+        hasBackState.value = true
 
-      // 清空前进状态
-      forwardVideoList.value = []
-      forwardAppVideoList.value = []
-      hasForwardState.value = false
+        // 清空前进状态
+        forwardVideoList.value = []
+        hasForwardState.value = false
+      }
+      // 显示撤销按钮
+      showUndoButton.value = true
     }
-
-    // 显示撤销按钮
-    showUndoButton.value = true
 
     initData()
   }
 
   // 修改撤销刷新的处理函数
   handleUndoRefresh.value = () => {
-    if (hasBackState.value && cachedVideoList.value.length > 0) {
-      // 保存当前数据到前进状态
-      forwardVideoList.value = JSON.parse(JSON.stringify(videoList.value))
-      forwardAppVideoList.value = JSON.parse(JSON.stringify(appVideoList.value))
-      forwardRefreshIdx.value = refreshIdx.value
-      hasForwardState.value = true
+    if (hasBackState.value) {
+      if (settings.value.recommendationMode === 'web' && cachedVideoList.value.length > 0) {
+        // Web模式下的后退操作
+        // 保存当前数据到前进状态
+        forwardVideoList.value = JSON.parse(JSON.stringify(videoList.value))
+        forwardRefreshIdx.value = refreshIdx.value
+        hasForwardState.value = true
 
-      // 恢复缓存的数据
-      videoList.value = cachedVideoList.value
-      appVideoList.value = cachedAppVideoList.value
-      refreshIdx.value = cachedRefreshIdx.value
+        // 恢复缓存的数据
+        videoList.value = cachedVideoList.value
+        refreshIdx.value = cachedRefreshIdx.value
 
-      // 标记为已经后退
-      hasBackState.value = false
-      showUndoButton.value = false
+        hasBackState.value = false
+        showUndoButton.value = false
+      }
     }
   }
-}
 
-// 添加前进功能
-handleForwardRefresh.value = () => {
-  if (hasForwardState.value && forwardVideoList.value.length > 0) {
-    // 保存当前数据到后退状态
-    cachedVideoList.value = JSON.parse(JSON.stringify(videoList.value))
-    cachedAppVideoList.value = JSON.parse(JSON.stringify(appVideoList.value))
-    cachedRefreshIdx.value = refreshIdx.value
-    hasBackState.value = true
+  // 添加前进功能
+  handleForwardRefresh.value = () => {
+    if (hasForwardState.value) {
+      if (settings.value.recommendationMode === 'web' && forwardVideoList.value.length > 0) {
+        // Web模式下的前进操作
+        // 保存当前数据到后退状态
+        cachedVideoList.value = JSON.parse(JSON.stringify(videoList.value))
+        cachedRefreshIdx.value = refreshIdx.value
+        hasBackState.value = true
 
-    // 恢复前进状态的数据
-    videoList.value = forwardVideoList.value
-    appVideoList.value = forwardAppVideoList.value
-    refreshIdx.value = forwardRefreshIdx.value
+        // 恢复前进状态的数据
+        videoList.value = forwardVideoList.value
+        refreshIdx.value = forwardRefreshIdx.value
 
-    // 标记为已经前进
-    hasForwardState.value = false
-    showUndoButton.value = true
-    return true
+        // 标记为已经前进
+        hasForwardState.value = false
+        showUndoButton.value = true
+        return true
+      }
+    }
+    return false
   }
-  return false
 }
 
 async function getRecommendVideos() {
@@ -490,8 +501,8 @@ defineExpose({
   goForward: () => {
     handleForwardRefresh.value?.()
   },
-  canGoBack: () => hasBackState.value,
-  canGoForward: () => hasForwardState.value,
+  canGoBack: () => settings.value.recommendationMode === 'web' && hasBackState.value && cachedVideoList.value.length > 0,
+  canGoForward: () => settings.value.recommendationMode === 'web' && hasForwardState.value && forwardVideoList.value.length > 0,
 })
 </script>
 
