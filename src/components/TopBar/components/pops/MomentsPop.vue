@@ -45,7 +45,7 @@ watch(() => selectedMomentTab.value.type, (newVal, oldVal) => {
     scrollToTop(momentsWrap.value)
 
   initData()
-}, { immediate: true })
+})
 
 onMounted(() => {
   if (momentsWrap.value) {
@@ -106,6 +106,10 @@ function toggleWatchLater(aid: number) {
       })
   }
 }
+
+defineExpose({
+  initData,
+})
 </script>
 
 <template>

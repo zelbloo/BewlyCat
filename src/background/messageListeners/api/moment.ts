@@ -45,6 +45,18 @@ const API_MOMENT = {
     },
     afterHandle: AHS.J_D,
   },
+  getMomentsUpdate: {
+    url: 'https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/all/update',
+    _fetch: {
+      method: 'get',
+    },
+    params: {
+      type: 'video',
+      offset: 0,
+      update_baseline: '0',
+    },
+    afterHandle: AHS.J_D,
+  },
 } satisfies APIMAP
 
 export default API_MOMENT
