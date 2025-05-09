@@ -273,7 +273,7 @@ settings:
   safari_helpers_desc3: 帮解答注册苹果开发者问题
   safari_helpers_desc4: 帮解答注册苹果开发者问题
   contributors: BewlyBewly历史贡献者
-  enable_undo_refresh_button: 启用撤销刷新按钮
+  enable_undo_refresh_button: 启用撤销刷新按钮（仅在Web推荐模式下有效）
   enable_undo_refresh_button_desc: 刷新页面后显示撤销按钮，点击可恢复刷新前的内容
 auth:
   auth_access_key_first: 在这之前请先授权 BewlyCat 使用 access key

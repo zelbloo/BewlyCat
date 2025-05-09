@@ -94,8 +94,10 @@ watch(
 
 const focused = useWindowFocus()
 watch(() => focused.value, (newVal) => {
-  if (newVal && isLogin.value)
+  if (newVal && isLogin.value) {
     getUnreadMessageCount()
+    getTopBarNewMomentsCount('video')
+  }
 })
 
 watch(
@@ -112,9 +114,15 @@ watch(
       if (!newVal) {
         await getTopBarNewMomentsCount('video')
       }
+      else {
+        nextTick(() => {
+          if (momentsTransformer.value) {
+            (momentsTransformer.value as any).initData?.()
+          }
+        })
+      }
     }
   },
-  { immediate: true },
 )
 
 watch(

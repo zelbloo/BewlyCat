@@ -220,39 +220,13 @@ export const useTopBarStore = defineStore('topBar', () => {
     try {
       isLoadingMoments.value = true
 
-      const res = await api.moment.getTopBarMoments({
+      const res = await api.moment.getMomentsUpdate({
         type: selectedType,
-        update_baseline: momentUpdateBaseline.value || undefined,
+        update_baseline: '0',
       })
 
-      if (res.code === 0) {
-        const { update_num, update_baseline, items, has_more } = res.data
-
-        newMomentsCount.value = update_num
-
-        if (update_baseline && !popupVisible.moments)
-          momentUpdateBaseline.value = update_baseline
-
-        // 有新内容，则添加到列表顶部
-        if (update_num > 0 && items?.length) {
-          for (let i = update_num - 1; i >= 0; i--) {
-            moments.unshift({
-              type: selectedType,
-              title: items[i].title,
-              author: items[i].author.name,
-              authorFace: items[i].author.face,
-              authorJumpUrl: items[i].author.jump_url,
-              pubTime: items[i].pub_time,
-              cover: items[i].cover,
-              link: items[i].jump_url,
-              rid: items[i].rid,
-            })
-          }
-        }
-
-        // 更新是否有更多内容的标志
-        if (has_more === false)
-          noMoreMomentsContent.value = true
+      if (res.code === 0 && res.data) {
+        newMomentsCount.value = res.data.update_num
       }
     }
     catch (error) {
@@ -268,7 +242,7 @@ export const useTopBarStore = defineStore('topBar', () => {
     moments.length = 0
     momentUpdateBaseline.value = ''
     momentOffset.value = ''
-    newMomentsCount.value = 0
+    // newMomentsCount.value = 0
     livePage.value = 1
     noMoreMomentsContent.value = false
 
@@ -295,7 +269,7 @@ export const useTopBarStore = defineStore('topBar', () => {
     })
       .then((res: any) => {
         if (res.code === 0) {
-          const { has_more, items, offset, update_baseline, update_num } = res.data
+          const { has_more, items, offset, update_baseline } = res.data
 
           if (!has_more) {
             noMoreMomentsContent.value = true
@@ -303,7 +277,7 @@ export const useTopBarStore = defineStore('topBar', () => {
           }
 
           // 更新状态
-          newMomentsCount.value = update_num
+          // newMomentsCount.value = update_num
           momentUpdateBaseline.value = update_baseline
           momentOffset.value = offset
 
